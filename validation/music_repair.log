@@ -1,0 +1,8 @@
+Original files: .mp3 extension, actual Ogg/Vorbis. All four failed pygame.mixer.music.load.
+Converted files: MPEG Layer III, 44100 Hz, stereo, 192 kbps.
+Full FFmpeg decode: all four passed with -xerror.
+Runtime: Python 3.12 / Pygame 2.6.1 / SDL dummy audio; physical speaker output not tested.
+main_menu.mp3: duration=138.397s; scene transition/load/play and middle/end seeks PASS
+shop.mp3: duration=31.216s; scene transition/load/play and middle/end seeks PASS
+inventory.mp3: duration=211.148s; scene transition/load/play and middle/end seeks PASS
+match.mp3: duration=147.879s; scene transition/load/play and middle/end seeks PASS
