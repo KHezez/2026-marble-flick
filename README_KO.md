@@ -5,18 +5,20 @@
 ## Windows 실행
 
 1. ZIP을 쓰기 가능한 폴더에 **모두 압축 해제**합니다.
-2. Python 3.11~3.13을 설치합니다. 권장 버전은 3.12이며 설치할 때 PATH 추가를 선택합니다.
-3. `play_windows.bat`를 더블클릭합니다. 최초 실행은 인터넷으로 Pygame 2.6.1을 설치합니다. 이후에는 로컬 `.venv`를 재사용합니다.
+2. **Python 3.12 64비트**를 설치합니다. PowerShell에서 `winget install -e --id Python.Python.3.12`로 설치할 수 있습니다. 설치 후 터미널을 새로 여세요. 기존 Python은 제거할 필요 없습니다.
+3. `play_windows.bat`를 더블클릭합니다. 최초 실행은 인터넷으로 Pygame 2.6.1을 설치합니다. 이후에는 로컬 `.venv-py312`를 재사용합니다. 기존 `.venv`는 건드리지 않습니다. 소스 빌드 대신 검증된 설치용 wheel만 받습니다.
 4. 개발 테스트는 `play_dev_windows.bat`를 사용합니다. 일반 실행에서는 P키가 화폐를 만들지 않습니다.
 5. 설치 후 자동 테스트는 `test_windows.bat`를 실행합니다.
 
 수동 실행:
 
 ```text
-python -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt
-.venv\Scripts\python main.py
+py -3.12 -m venv .venv-py312
+.\.venv-py312\Scripts\python.exe -m pip install --only-binary=:all: -r requirements.txt
+.\.venv-py312\Scripts\python.exe main.py
 ```
+
+Windows에서 `pygame-2.6.1.tar.gz`, `Getting requirements to build wheel`, `distutils.msvccompiler` 오류가 나온다면 현재 Python 버전/아키텍처에 맞는 wheel을 찾지 못해 소스 빌드를 시도한 것입니다. 위 Python 3.12 64비트 전용 환경으로 설치하세요. 기존 가상환경을 활성화했어도 위 명령은 새 환경의 실행 파일을 직접 지정하므로 별도 활성화가 필요하지 않습니다. `py -3.12`가 없다고 나오면 Python 설치 후 새 터미널에서 다시 실행하세요.
 
 Linux/macOS: 가상환경에 `python -m pip install -r requirements.txt`를 실행한 뒤 `python main.py`를 실행합니다. 유일한 외부 Python 라이브러리는 **pygame==2.6.1**입니다. FFmpeg는 제공 효과음을 변환할 때만 사용했으며 게임 실행에는 필요하지 않습니다. 1280×900 창을 사용하므로 해당 크기 이상의 작업 영역을 권장합니다.
 

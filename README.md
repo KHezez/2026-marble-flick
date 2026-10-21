@@ -4,7 +4,7 @@
 
 **[전체 프로젝트 ZIP 다운로드](https://github.com/KHezez/2026-marble-flick/archive/refs/heads/main.zip)**
 
-압축을 모두 해제한 뒤 `play_windows.bat`를 실행하세요. Python 3.11~3.13(권장 3.12)이 필요하며, 최초 실행 시 Pygame을 설치합니다.
+압축을 모두 해제한 뒤 `play_windows.bat`를 실행하세요. Windows 실행기는 Python 3.12 64비트를 사용하며, 최초 실행 시 Pygame을 설치합니다. 기존 `.venv`와 별도의 `.venv-py312`를 사용합니다.
 
 - [한국어 사용 설명서](README_KO.md)
 - [MP3·BGM·PNG 전체 파일 목록](ASSETS_KO.md)
