@@ -1,0 +1,422 @@
+test_brickwall_immobile_and_bounce (test_abilities.SkillModelTests.test_brickwall_immobile_and_bounce) ... ok
+test_brickwall_immune_to_critical_injury (test_abilities.SkillModelTests.test_brickwall_immune_to_critical_injury) ... ok
+test_chain_enemy_contact_unlocks_dash_max_five (test_abilities.SkillModelTests.test_chain_enemy_contact_unlocks_dash_max_five) ... ok
+test_cola_explosion_sacrifice_and_last_egg_exemption (test_abilities.SkillModelTests.test_cola_explosion_sacrifice_and_last_egg_exemption) ... ok
+test_default_drag_only_normal_reduced (test_abilities.SkillModelTests.test_default_drag_only_normal_reduced) ... ok
+test_defense_only_brickwall (test_abilities.SkillModelTests.test_defense_only_brickwall) ... ok
+test_tiger_faster_breaks_wood (test_abilities.SkillModelTests.test_tiger_faster_breaks_wood) ... ok
+test_tiger_wind_hits_near_miss_but_not_brickwall (test_abilities.SkillModelTests.test_tiger_wind_hits_near_miss_but_not_brickwall) ... ok
+test_two_slots_no_duplicates_and_cooldown (test_abilities.SkillModelTests.test_two_slots_no_duplicates_and_cooldown) ... ok
+test_cpu_prefers_ringout_to_a_miss (test_cpu.CPULabTests.test_cpu_prefers_ringout_to_a_miss) ... ok
+test_modes_have_candidates_and_legal_shots (test_cpu.CPULabTests.test_modes_have_candidates_and_legal_shots) ... ok
+test_normal_cpu_aims_toward_real_enemy (test_cpu.CPULabTests.test_normal_cpu_aims_toward_real_enemy) ... ok
+test_obstacle_aware_candidate_and_empty_team (test_cpu.CPULabTests.test_obstacle_aware_candidate_and_empty_team) ... ok
+test_score_reward_enemy_loss_penalize_self_loss (test_cpu.CPULabTests.test_score_reward_enemy_loss_penalize_self_loss) ... ok
+test_attack_brickwall_survives_enemy_turn (test_game_phases.TurnStateTests.test_attack_brickwall_survives_enemy_turn) ... ok
+test_human_can_defend_when_cpu_attacks (test_game_phases.TurnStateTests.test_human_can_defend_when_cpu_attacks) ... ok
+test_tiger_lock_zero_aim_error_and_cooldown (test_game_phases.TurnStateTests.test_tiger_lock_zero_aim_error_and_cooldown) ... ok
+test_timeout_passes_without_spending (test_game_phases.TurnStateTests.test_timeout_passes_without_spending) ... ok
+test_two_locks_required_before_shooting (test_game_phases.TurnStateTests.test_two_locks_required_before_shooting) ... ok
+test_six_variations_finish_motion (test_matchflow.MatchFlowTest.test_six_variations_finish_motion) ... ok
+test_all_static_factors_actual_launch_mass_and_radius (test_perks.PassiveTests.test_all_static_factors_actual_launch_mass_and_radius) ... ok
+test_all_twelve_registered (test_perks.PassiveTests.test_all_twelve_registered) ... ok
+test_brickwall_preserves_passive_radius_and_immunity (test_perks.PassiveTests.test_brickwall_preserves_passive_radius_and_immunity) ... ok
+test_cpu_uses_perks_in_simulation_without_mutating_original (test_perks.PassiveTests.test_cpu_uses_perks_in_simulation_without_mutating_original) ... ok
+test_curve_changes_trajectory_not_speed (test_perks.PassiveTests.test_curve_changes_trajectory_not_speed) ... ok
+test_fast_rat_heavenly_tiger_cannot_tunnel_thin_steel (test_perks.PassiveTests.test_fast_rat_heavenly_tiger_cannot_tunnel_thin_steel) ... ok
+test_friendship_live_cap_and_isolation (test_perks.PassiveTests.test_friendship_live_cap_and_isolation) ... ok
+test_heavenly_odd_and_probability (test_perks.PassiveTests.test_heavenly_odd_and_probability) ... ok
+test_invalid_loadouts (test_perks.PassiveTests.test_invalid_loadouts) ... ok
+test_one_v_one_has_shield_but_no_clutch (test_perks.PassiveTests.test_one_v_one_has_shield_but_no_clutch) ... ok
+test_power_increases_actual_knockback (test_perks.PassiveTests.test_power_increases_actual_knockback) ... ok
+test_simultaneous_falls_keep_last_survivor_both_orders (test_perks.PassiveTests.test_simultaneous_falls_keep_last_survivor_both_orders) ... ok
+test_stacking_order_and_injury (test_perks.PassiveTests.test_stacking_order_and_injury) ... ok
+test_tungsten_shortens_nonstacking_injury (test_perks.PassiveTests.test_tungsten_shortens_nonstacking_injury) ... ok
+test_all_team_sizes_surfaces_and_large_small_colliders (test_perks.PhysicsStressTests.test_all_team_sizes_surfaces_and_large_small_colliders) ... ok
+test_cola_sacrifice_can_activate_clutch_and_last_resort (test_perks.PhysicsStressTests.test_cola_sacrifice_can_activate_clutch_and_last_resort) ... ok
+test_all_team_compositions_face_vertically (test_physics.PhysicsTests.test_all_team_compositions_face_vertically) ... ok
+test_friction_order_and_distance (test_physics.PhysicsTests.test_friction_order_and_distance) ... ok
+test_game_counts (test_physics.PhysicsTests.test_game_counts) ... ok
+test_hit_transfers_momentum (test_physics.PhysicsTests.test_hit_transfers_momentum) ... ok
+test_normal_surface_stops (test_physics.PhysicsTests.test_normal_surface_stops) ... ok
+test_out_of_bounds_is_fall_not_reflection (test_physics.PhysicsTests.test_out_of_bounds_is_fall_not_reflection) ... ok
+test_shoot_requires_live_idle_egg (test_physics.PhysicsTests.test_shoot_requires_live_idle_egg) ... ok
+test_slingshot_direction_is_reversed (test_physics.PhysicsTests.test_slingshot_direction_is_reversed) ... ok
+test_steel_bounces (test_physics.PhysicsTests.test_steel_bounces) ... ok
+test_wood_can_break (test_physics.PhysicsTests.test_wood_can_break) ... ok
+test_power_doesnt_change_unopposed_travel (test_physics_split.SplitTests.test_power_doesnt_change_unopposed_travel) ... ok
+test_power_is_knockback_not_travel (test_physics_split.SplitTests.test_power_is_knockback_not_travel) ... ok
+test_resistance_and_injury (test_physics_split.SplitTests.test_resistance_and_injury) ... ok
+test_speed_is_mostly_distance (test_physics_split.SplitTests.test_speed_is_mostly_distance) ... ok
+test_toughness_reduces_knockback (test_physics_split.SplitTests.test_toughness_reduces_knockback) ... ok
+test_corrupt_primary_recovers_backup (test_profile.ProfileTests.test_corrupt_primary_recovers_backup) ... WARNING:root:Profile cannot be loaded /tmp/tmp34xwidhc/p.json: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
+ok
+test_every_rarity_has_pool_and_duplicate_refund (test_profile.ProfileTests.test_every_rarity_has_pool_and_duplicate_refund) ... ok
+test_invalid_save_is_sanitized (test_profile.ProfileTests.test_invalid_save_is_sanitized) ... ok
+test_match_rewards (test_profile.ProfileTests.test_match_rewards) ... ok
+test_no_money_no_mutation (test_profile.ProfileTests.test_no_money_no_mutation) ... ok
+test_restrictions_ownership_slots (test_profile.ProfileTests.test_restrictions_ownership_slots) ... ok
+test_save_restart_preserves_both_loadouts_coins_audio_and_history (test_profile.ProfileTests.test_save_restart_preserves_both_loadouts_coins_audio_and_history) ... ok
+test_stats_caps_and_budget (test_profile.ProfileTests.test_stats_caps_and_budget) ... ok
+test_critical_contact_injures_target_when_roll_succeeds (test_stats.CriticalContactTests.test_critical_contact_injures_target_when_roll_succeeds) ... ok
+test_no_critical_without_points (test_stats.CriticalContactTests.test_no_critical_without_points) ... ok
+test_50_point_cap_and_per_stat_caps (test_stats.StatLabTests.test_50_point_cap_and_per_stat_caps) ... ok
+test_accuracy_cones_and_injury (test_stats.StatLabTests.test_accuracy_cones_and_injury) ... ok
+test_injury_is_nonstacking_and_expires_after_two_owner_turns (test_stats.StatLabTests.test_injury_is_nonstacking_and_expires_after_two_owner_turns) ... ok
+test_maxed_stat_differences (test_stats.StatLabTests.test_maxed_stat_differences) ... ok
+test_mud_friction_variance_is_segmented_in_thirds (test_stats.StatLabTests.test_mud_friction_variance_is_segmented_in_thirds) ... ok
+test_physics_defense_resists_more (test_stats.StatLabTests.test_physics_defense_resists_more) ... ok
+test_physics_offensive_mass_pushes_more (test_stats.StatLabTests.test_physics_offensive_mass_pushes_more) ... ok
+test_random_error_falls_inside_full_cone (test_stats.StatLabTests.test_random_error_falls_inside_full_cone) ... ok
+test_shot_speed_respects_team_stats_and_injury (test_stats.StatLabTests.test_shot_speed_respects_team_stats_and_injury) ... ok
+test_actual_run_loop_exit (test_v06_game.GameIntegrationTests.test_actual_run_loop_exit) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_animated_effects_do_not_change_coordinates (test_v06_game.GameIntegrationTests.test_animated_effects_do_not_change_coordinates) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_backgrounds_missing_and_valid_png (test_v06_game.GameIntegrationTests.test_backgrounds_missing_and_valid_png) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_badly_named_mp4_logs_fallback (test_v06_game.GameIntegrationTests.test_badly_named_mp4_logs_fallback) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_clutch_resets_once_not_one_v_one (test_v06_game.GameIntegrationTests.test_clutch_resets_once_not_one_v_one) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_cola_actual_game_launch_and_single_explosion_sound (test_v06_game.GameIntegrationTests.test_cola_actual_game_launch_and_single_explosion_sound) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_cpu_and_local_full_turn_paths (test_v06_game.GameIntegrationTests.test_cpu_and_local_full_turn_paths) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+WARNING:marble.audio:SFX channels exhausted: drop; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: drop; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: drop; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: match; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: lock; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: lock; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: reveal; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: shoot; replacing oldest nonreserved channel
+ok
+test_curve_controls_only_equipped_and_curve_locked (test_v06_game.GameIntegrationTests.test_curve_controls_only_equipped_and_curve_locked) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_dev_currency_gated_and_tab_pass (test_v06_game.GameIntegrationTests.test_dev_currency_gated_and_tab_pass) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_existing_and_missing_audio_channels_mute_volume (test_v06_game.GameIntegrationTests.test_existing_and_missing_audio_channels_mute_volume) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: clack; replacing oldest nonreserved channel
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/ui_click.mp3: fallback: ui_click.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/marble_hit.mp3: fallback: marble_hit.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/marble_flick.mp3: fallback: marble_flick.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/marble_fall.mp3: fallback: marble_fall.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/wood_break.mp3: fallback: wood_break.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/injury.mp3: fallback: injury.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/brickwall_activate.mp3: fallback: brickwall_activate.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/brickwall_hit.mp3: fallback: brickwall_hit.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/tiger_shot.mp3: fallback: tiger_shot.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/tiger_wind.mp3: fallback: tiger_wind.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/chain_start.mp3: fallback: chain_start.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/chain_hit.mp3: fallback: chain_hit.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/chain_dash.mp3: fallback: chain_dash.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/cola_charge.mp3: fallback: cola_charge.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/cola_explosion.mp3: fallback: cola_explosion.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/turn_lock.mp3: fallback: turn_lock.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/reveal.mp3: fallback: reveal.mp3
+WARNING:marble.audio:/tmp/tmptf2so1rt/missing/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_eyes_reveals_only_at_defense_lock_and_eight_turn_cooldown (test_v06_game.GameIntegrationTests.test_eyes_reveals_only_at_defense_lock_and_eight_turn_cooldown) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_future_skills_not_equip_or_draw_candidates (test_v06_game.GameIntegrationTests.test_future_skills_not_equip_or_draw_candidates) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_hidden_defense_not_rendered_until_reveal (test_v06_game.GameIntegrationTests.test_hidden_defense_not_rendered_until_reveal) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_music_load_fade_switch_and_mute (test_v06_game.GameIntegrationTests.test_music_load_fade_switch_and_mute) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/ui_click.mp3: fallback: ui_click.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/marble_hit.mp3: fallback: marble_hit.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/marble_flick.mp3: fallback: marble_flick.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/marble_fall.mp3: fallback: marble_fall.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/wood_break.mp3: fallback: wood_break.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/injury.mp3: fallback: injury.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/brickwall_activate.mp3: fallback: brickwall_activate.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/brickwall_hit.mp3: fallback: brickwall_hit.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/tiger_shot.mp3: fallback: tiger_shot.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/tiger_wind.mp3: fallback: tiger_wind.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/chain_start.mp3: fallback: chain_start.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/chain_hit.mp3: fallback: chain_hit.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/chain_dash.mp3: fallback: chain_dash.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/cola_charge.mp3: fallback: cola_charge.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/cola_explosion.mp3: fallback: cola_explosion.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/turn_lock.mp3: fallback: turn_lock.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/reveal.mp3: fallback: reveal.mp3
+WARNING:marble.audio:/tmp/tmp0_2311lm/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_real_menu_navigation_shop_inventory_stats_and_match (test_v06_game.GameIntegrationTests.test_real_menu_navigation_shop_inventory_stats_and_match) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_reward_once_and_red_profile_persists (test_v06_game.GameIntegrationTests.test_reward_once_and_red_profile_persists) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+test_zero_skills_allowed_and_persisted (test_v06_game.GameIntegrationTests.test_zero_skills_allowed_and_persisted) ... WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ui_hover.mp3: fallback: ui_hover.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_enter.mp3: fallback: menu_enter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/menu_transition.mp3: fallback: menu_transition.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/shop_open.mp3: fallback: shop_open.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_start.mp3: fallback: gacha_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_result.mp3: fallback: gacha_result.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/gacha_rare.mp3: fallback: gacha_rare.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/inventory_equip.mp3: fallback: inventory_equip.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/passive_activate.mp3: fallback: passive_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/clutch_activate.mp3: fallback: clutch_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/match_start.mp3: fallback: match_start.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/victory.mp3: fallback: victory.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+ok
+
+----------------------------------------------------------------------
+Ran 87 tests in 6.294s
+
+OK
+pygame 2.6.1 (SDL 2.28.4, Python 3.12.14)
+Hello from the pygame community. https://www.pygame.org/contribute.html
