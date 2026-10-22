@@ -1,3 +1,11 @@
-main_menu.png, shop.png, inventory.png: 1280x900
-arena_normal.png, arena_ice.png, arena_mud.png: 560x675
-선택 파일이며 기본 도형 배경이 있습니다. ASSETS_KO.md 참고.
+AI로 제작한 오리지널 배경 PNG 6개입니다.
+main_menu.png: 구름과 구슬이 있는 하늘색 아케이드 풍경
+shop.png: 노랑/민트 캡슐 상점
+inventory.png: 파랑/라일락 구슬 전시 공간
+arena_normal.png: 민트 펠트 경기장
+arena_ice.png: 하늘색 서리 경기장
+arena_mud.png: 밝은 모래색 점토 경기장
+
+고해상도 원본을 그대로 포함했습니다. 메뉴는 게임에서 1280x900, 경기장은 560x675로 자동 축소합니다.
+PNG는 장식이며 실제 구슬/장애물/경계 판정을 변경하지 않습니다.
+파일 교체 후 게임을 종료하고 다시 실행하세요.
