@@ -8,6 +8,7 @@ from stats import TeamStats, STAT_CAPS
 from perks import PERKS, validate
 from abilities import SKILLS
 from skins import SKINS
+from runtime_paths import default_save_path
 
 def default_profile():
     load={'skills':['brickwall','tiger'],'perks':[], 'stats':{k:0 for k in STAT_CAPS}, 'skin':'classic'}
@@ -17,7 +18,7 @@ def default_profile():
 
 class SaveStore:
     def __init__(self,path=None):
-        self.path=Path(path or os.environ.get('MARBLE_SAVE_PATH',str(Path(__file__).resolve().parent/'user_data'/'profile.json')))
+        self.path=Path(path) if path is not None else default_save_path()
         self.recovered=False
     def load(self):
         for path in (self.path,self.path.with_suffix('.bak')):

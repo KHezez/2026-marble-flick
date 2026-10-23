@@ -123,7 +123,7 @@ class MenuUI:
         self.hover=hit
     def render(self):
         g=self.g;self.widgets=[];self.background({'shop':'shop','inventory':'inventory'}.get(self.page,'main_menu'))
-        g.label('MARBLE FLICK',35,22,'title',WHITE);g.label('v0.8',360,35,'body',GOLD)
+        g.label('MARBLE FLICK',35,22,'title',WHITE);g.label('v0.8.1',360,35,'body',GOLD)
         self.button((990,20,250,58),f"{g.profile['coins']:,} Coins",'noop',selected=True)
         if self.page!='home':
             self.button((35,105,140,50),'BACK','resume' if getattr(g,'_settings_return_state',None) else 'page',None if getattr(g,'_settings_return_state',None) else 'home')

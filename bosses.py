@@ -11,7 +11,7 @@ BOSSES={
 def install(arena,kind,coop=False):
     if kind not in BOSSES:raise ValueError('Unknown boss')
     arena.eggs=[e for e in arena.eggs if e.team==0]
-    hp=round(BOSSES[kind][2]*(1.45 if coop else 1))
+    hp=round(BOSSES[kind][2]*(1.45 if coop else 1))*4
     boss=Egg(100,1,arena.left+arena.width/2,arena.top+140,r=48,mass=3.8,base_radius=48)
     boss.boss=True;boss.skin='gokbin' if kind=='gokbin' else 'gold' if kind=='warden' else 'ocean'
     from stats import TeamStats
@@ -32,7 +32,7 @@ def hurt(arena,amount):
     arena.events.append(Event('boss_hit',boss.x,boss.y,1,min(1.8,amount/20)))
     if state['hp']>0:return
     if state['kind']=='gokbin' and state['phase']==1:
-        state['phase']=2;state['max_hp']=round(230*(1.45 if state['coop'] else 1));state['hp']=state['max_hp']
+        state['phase']=2;state['max_hp']=round(230*(1.45 if state['coop'] else 1))*4;state['hp']=state['max_hp']
         state['pattern']='';state['telegraphs']=[]
         boss.skin='gokbin_curse';boss.x=arena.left+arena.width/2;boss.y=arena.top+140;boss.vx=boss.vy=0
         boss.injury_turns=0;boss.defense='';boss.brickwall=False;boss.alive=True

@@ -1,4 +1,4 @@
-# Marble Flick v0.8
+# Marble Flick v0.8.1
 
 Python / Pygame arcade marble PvP, expanded from the existing v0.7 codebase.
 
@@ -7,13 +7,18 @@ Python / Pygame arcade marble PvP, expanded from the existing v0.7 codebase.
 - Three solo/cooperative bosses, including two-phase Gokbin and its exclusive red skin reward.
 - Host-authoritative two-player LAN: versus, shared-team CPU battles and cooperative bosses.
 - Tiger Shot nerf; supplied music/SFX decoded and mislabeled Ogg files converted to real MP3.
-- No EXE build yet. Run `play_windows.bat`, or install `requirements.txt` and run `python main.py`.
+- Windows single EXE: Python, Pygame and all assets bundled. Boss HP is 4× the v0.8 baseline.
+- Source users can still run `play_windows.bat` or `python main.py`.
 
 [한국어 설치·조작·LAN 안내](README_KO.md) · [전체 에셋 목록](ASSETS_KO.md) · [검증 결과](validation/v08/REPORT_KO.md)
 
-[Download v0.8 ZIP](https://github.com/KHezez/2026-marble-flick/raw/refs/heads/main/downloads/marble_flick_v0.8.zip)
+[Windows EXE download](https://github.com/KHezez/2026-marble-flick/releases/download/v0.8.1/MarbleFlick.exe) · [EXE 사용법](EXE_README_KO.md)
+
+[Previous v0.8 source ZIP](https://github.com/KHezez/2026-marble-flick/raw/refs/heads/main/downloads/marble_flick_v0.8.zip)
 
 Keep your existing `user_data` folder when upgrading. Save data is not included in the release.
 
 Tests: `python -m unittest discover -s tests` or `test_windows.bat`.
 LAN uses IPv4 TCP 24872 on the same network; no matchmaking server. P grants 1000 Coins offline only.
+
+Windows build: `python -m pip install -r requirements-build.txt` then `python -m PyInstaller --clean --noconfirm MarbleFlick.spec`. The GitHub Actions workflow builds and tests the real EXE before publishing.

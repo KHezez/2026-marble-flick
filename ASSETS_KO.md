@@ -1,4 +1,4 @@
-# v0.8 에셋 전체 목록
+# v0.8.1 에셋 전체 목록
 
 사용자가 제공한 파일을 포함했습니다. `.mp3`라는 이름의 Ogg 데이터는 실제 MP3로 변환해 SDL 디코더 오류를 예방했습니다. 파일이 없으면 효과음은 합성 대체음, 보스 BGM은 일반 전투 음악을 사용합니다. 원본 사진 PNG는 변경하지 않았습니다.
 
@@ -53,13 +53,13 @@
 | `skin_draw.mp3` | 스킨 뽑기 결과 | 미제공 · 합성 대체음 |
 | `walls_open.mp3` | 13턴 강철 경계벽 개방 | 포함 |
 | `boss_warning.mp3` | 보스 공격 예고 | 미제공 · 합성 대체음 |
-| `boss_attack.mp3` | 보스 패턴 발동 | 미제공 · 합성 대체음 |
-| `boss_hit.mp3` | 보스 피격 | 미제공 · 합성 대체음 |
-| `boss_phase.mp3` | 보스 2페이즈 전환 | 미제공 · 합성 대체음 |
-| `boss_defeat.mp3` | 보스 처치 | 미제공 · 합성 대체음 |
-| `boss_reward.mp3` | 전용 스킨 해금 | 미제공 · 합성 대체음 |
-| `lan_connect.mp3` | LAN 연결 | 미제공 · 합성 대체음 |
-| `lan_disconnect.mp3` | LAN 연결 종료 | 미제공 · 합성 대체음 |
+| `boss_attack.mp3` | 보스 패턴 발동 | 포함 |
+| `boss_hit.mp3` | 보스 피격 | 포함 |
+| `boss_phase.mp3` | 보스 2페이즈 전환 | 포함 |
+| `boss_defeat.mp3` | 보스 처치 | 포함 |
+| `boss_reward.mp3` | 전용 스킨 해금 | 포함 |
+| `lan_connect.mp3` | LAN 연결 | 포함 |
+| `lan_disconnect.mp3` | LAN 연결 종료 | 포함 |
 
 ## 음악 — `assets/music/`
 
@@ -77,10 +77,10 @@
 | `battle_ice.mp3` | 빙하 삼각주 | 포함 |
 | `clutch.mp3` | 마지막 공 클러치 | 포함 |
 | `curse.mp3` | 노곡빈의 저주 시전 | 포함 |
-| `boss_warden.mp3` | 철갑 수호자 | 미제공 · 기존 음악으로 대체 |
-| `boss_tempest.mp3` | 폭풍 정령 | 미제공 · 기존 음악으로 대체 |
-| `boss_gokbin.mp3` | 노곡빈 1페이즈 | 미제공 · 기존 음악으로 대체 |
-| `boss_gokbin_phase2.mp3` | 노곡빈 2페이즈 | 미제공 · 기존 음악으로 대체 |
+| `boss_warden.mp3` | 철갑 수호자 | 포함 |
+| `boss_tempest.mp3` | 폭풍 정령 | 포함 |
+| `boss_gokbin.mp3` | 노곡빈 1페이즈 | 포함 |
+| `boss_gokbin_phase2.mp3` | 노곡빈 2페이즈 | 포함 |
 
 보스전에서는 페이즈별 보스 음악을 우선합니다. 누락된 보스 음악은 `match.mp3`로 대체합니다. 음악은 화면 전환 시 페이드합니다. 파일 확장자만 바꾸면 변환되지 않습니다. 실제 MP3로 내보내세요.
 
@@ -120,4 +120,4 @@
 | `assets/vfx/eyes_of_heaven.png` | 기존 PNG 아틀라스 / 효과 이미지 · 교체 시 원래 분할 구조 유지 |
 | `assets/vfx/vfx_burst.png` | 기존 PNG 아틀라스 / 효과 이미지 · 교체 시 원래 분할 구조 유지 |
 
-보스 전용 음원 4개와 보스·LAN 효과음 8개는 아직 미제공입니다. 위 파일명 그대로 넣으면 적용됩니다. 추가 PNG 없이도 모든 신규 모드가 실행됩니다.
+보스 전용 BGM 4개와 보스·LAN 효과음 7개를 추가했습니다. 아직 없는 효과음은 defeat.mp3, countdown.mp3, curse_launch.mp3, skin_draw.mp3, boss_warning.mp3이며 합성 대체음을 사용합니다. settings.mp3는 main_menu.mp3로 대체합니다. EXE에는 현재 에셋 전체가 내장됩니다.

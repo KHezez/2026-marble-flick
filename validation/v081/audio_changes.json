@@ -1,0 +1,68 @@
+[
+  {
+    "file": "assets/sfx/boss_attack.mp3",
+    "source_format": "ogg",
+    "converted": true,
+    "seconds": 1.824
+  },
+  {
+    "file": "assets/sfx/boss_defeat.mp3",
+    "source_format": "mp3",
+    "converted": false,
+    "seconds": 2.246531
+  },
+  {
+    "file": "assets/sfx/boss_hit.mp3",
+    "source_format": "ogg",
+    "converted": true,
+    "seconds": 0.639501
+  },
+  {
+    "file": "assets/sfx/boss_phase.mp3",
+    "source_format": "mp3",
+    "converted": false,
+    "seconds": 3.57875
+  },
+  {
+    "file": "assets/sfx/boss_reward.mp3",
+    "source_format": "mp3",
+    "converted": false,
+    "seconds": 0.792
+  },
+  {
+    "file": "assets/sfx/lan_connect.mp3",
+    "source_format": "ogg",
+    "converted": true,
+    "seconds": 1.531066
+  },
+  {
+    "file": "assets/sfx/lan_disconnect.mp3",
+    "source_format": "ogg",
+    "converted": true,
+    "seconds": 2.474667
+  },
+  {
+    "file": "assets/music/boss_gokbin.mp3",
+    "source_format": "mp3",
+    "converted": false,
+    "seconds": 159.192
+  },
+  {
+    "file": "assets/music/boss_gokbin_phase2.mp3",
+    "source_format": "mp3",
+    "converted": false,
+    "seconds": 198.792
+  },
+  {
+    "file": "assets/music/boss_tempest.mp3",
+    "source_format": "ogg",
+    "converted": true,
+    "seconds": 123.954671
+  },
+  {
+    "file": "assets/music/boss_warden.mp3",
+    "source_format": "ogg",
+    "converted": true,
+    "seconds": 177.0
+  }
+]

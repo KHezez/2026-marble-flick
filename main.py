@@ -1,4 +1,4 @@
-"""MARBLE FLICK v0.8 — photo skins, solo bosses and authoritative LAN play.
+"""MARBLE FLICK v0.8.1 — photo skins, solo bosses and authoritative LAN play.
 
 Controls
 --------
@@ -103,7 +103,7 @@ class Game:
     def __init__(self):
         pygame.mixer.pre_init(44100, -16, 1, 256)
         pygame.init()
-        pygame.display.set_caption("Marble Flick v0.8")
+        pygame.display.set_caption("Marble Flick v0.8.1")
         self.screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
         self.clock = pygame.time.Clock()
         self.fonts = {
@@ -1192,7 +1192,7 @@ class Game:
         curse_bg=self.curse_background((SCREEN_W,SCREEN_H))
         if curse_bg is not None:self.screen.blit(curse_bg,(0,0))
         self.label("MARBLE FLICK",37,23,"title",TEXT)
-        self.label("BOSSES + LAN  /  V0.8",38,59,"small",MUTED)
+        self.label("BOSSES + LAN  /  V0.8.1",38,59,"small",MUTED)
         lang=self.profile['settings']['language'];map_name=MAPS[self.arena.map_key][0 if lang=='ko' else 1]
         matchup=f"{self.count} vs BOSS" if self.arena.boss_state else f"{self.count}v{self.count}"
         self.label(f"{matchup}  |  {map_name}",SCREEN_W-36,31,'body_b',TEXT,'topright')

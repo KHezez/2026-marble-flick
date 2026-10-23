@@ -44,8 +44,8 @@ class BossTests(unittest.TestCase):
         hp=a.boss_state['hp'];a._egg_collision(e,b,True);self.assertLess(a.boss_state['hp'],hp)
         hp=a.boss_state['hp'];b.x=a.left-10;a.resolve_edges();self.assertTrue(b.alive);self.assertLess(a.boss_state['hp'],hp)
     def test_coop_hp_scaling_and_final_no_extra_phase(self):
-        a=make_match(4);bosses.install(a,'gokbin',True);self.assertEqual(a.boss_state['hp'],261)
-        bosses.hurt(a,9999);self.assertEqual(a.boss_state['hp'],334)
+        a=make_match(4);bosses.install(a,'gokbin',True);self.assertEqual(a.boss_state['hp'],1044)
+        bosses.hurt(a,9999);self.assertEqual(a.boss_state['hp'],1336)
         bosses.hurt(a,9999);bosses.hurt(a,9999);self.assertTrue(a.boss_state['defeated'])
     def test_locked_reward_sanitization_and_old_save_migration(self):
         p=default_profile();p['coins']=123;p['owned_skins'].append('gokbin_curse')
