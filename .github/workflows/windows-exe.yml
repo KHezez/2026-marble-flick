@@ -39,21 +39,27 @@ jobs:
           SDL_VIDEODRIVER: dummy
           SDL_AUDIODRIVER: dummy
           MARBLE_SAVE_PATH: ${{ runner.temp }}\marble-source-test.json
+        shell: python
         run: |
-          python -m unittest discover -s tests 2>&1 | Tee-Object -FilePath source-tests.log
-          if ($LASTEXITCODE -ne 0) {
-            $details = (Get-Content source-tests.log -Tail 80) -join '%0A'
-            Write-Output "::error title=Source test failures::$details"
-            throw 'Source tests failed'
-          }
+          import pathlib, subprocess, sys
+          r = subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace')
+          pathlib.Path('source-tests.log').write_text(r.stdout, encoding='utf-8')
+          print(r.stdout)
+          if r.returncode:
+              message = r.stdout[-12000:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print('::error title=Source test failures::' + message)
+          sys.exit(r.returncode)
       - name: Build one-file GUI EXE
+        shell: python
         run: |
-          python -m PyInstaller --clean --noconfirm MarbleFlick.spec 2>&1 | Tee-Object -FilePath build-exe.log
-          if ($LASTEXITCODE -ne 0) {
-            $details = (Get-Content build-exe.log -Tail 60) -join '%0A'
-            Write-Output "::error title=EXE build failure::$details"
-            throw 'PyInstaller build failed'
-          }
+          import pathlib, subprocess, sys
+          r = subprocess.run([sys.executable, '-m', 'PyInstaller', '--clean', '--noconfirm', 'MarbleFlick.spec'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace')
+          pathlib.Path('build-exe.log').write_text(r.stdout, encoding='utf-8')
+          print(r.stdout)
+          if r.returncode:
+              message = r.stdout[-12000:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print('::error title=EXE build failure::' + message)
+          sys.exit(r.returncode)
       - name: Test the actual EXE including two-process LAN
         shell: pwsh
         run: |
