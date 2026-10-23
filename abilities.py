@@ -1,13 +1,14 @@
-"""Skill loadouts and countdowns for Marble Flick v0.5, no Pygame dependency.
+"""Skill loadouts and countdowns for Marble Flick v0.7, no Pygame dependency.
 
 Cooldowns count completed attack turns (both colours), not wall-clock seconds.
 This makes them predictable in the 25-second simultaneous planning phase.
 """
 from dataclasses import dataclass, field
 
-SKILLS = ("brickwall", "tiger", "chain", "cola")
+SKILLS = ("brickwall", "tiger", "chain", "cola", "bull", "ankle_breaker", "curse", "infinity")
 SKILL_NAMES = {"brickwall": "BRICKWALL", "tiger": "TIGER SHOT", "chain": "CHAIN", "cola": "COCA COLA ESPUMA"}
-COOLDOWNS = {"brickwall": 6, "tiger": 7, "chain": 10, "cola": 7}
+SKILL_NAMES.update(bull="BULL",ankle_breaker="ANKLE BREAKER",curse="NOGOKBIN CURSE",infinity="INFINITY")
+COOLDOWNS = {"brickwall": 6, "tiger": 7, "chain": 10, "cola": 7, "bull":8, "ankle_breaker":5, "curse":0, "infinity":8}
 
 
 @dataclass
@@ -15,6 +16,8 @@ class SkillLoadout:
     slots: list[str] = field(default_factory=lambda: ["brickwall", "tiger"])
     selected: int = 0
     ready_at: dict[str, int] = field(default_factory=lambda: {k: 1 for k in SKILLS})
+
+    used_once: set[str] = field(default_factory=set)
 
     def equipped(self) -> str:
         return self.slots[min(self.selected,len(self.slots)-1)] if self.slots else ""
@@ -35,12 +38,13 @@ class SkillLoadout:
         return max(0, self.ready_at[skill] - turn_number)
 
     def ready(self, skill: str, turn_number: int) -> bool:
-        return skill in self.slots and self.remaining(skill, turn_number) == 0
+        return skill in self.slots and self.remaining(skill, turn_number) == 0 and (skill != "curse" or turn_number>=11 and skill not in self.used_once)
 
     def commit(self, skill: str, turn_number: int):
         if not self.ready(skill, turn_number):
             raise ValueError("Skill on cooldown or not equipped")
         self.ready_at[skill] = turn_number + COOLDOWNS[skill]
+        if skill=="curse":self.used_once.add(skill)
 
 
 @dataclass(frozen=True)
@@ -50,18 +54,18 @@ class PreparedSkill:
 
 
 def can_prepare(skill: str, is_attacker: bool) -> bool:
-    return skill in SKILLS and (skill == "brickwall" or is_attacker)
+    return skill in (("brickwall","tiger","chain","cola","bull","curse") if is_attacker else ("brickwall","bull","ankle_breaker","infinity"))
 
-# Declarative extension points: future entries are excluded from equip and draws.
-FUTURE_SKILLS = {
-    'bull': {'name':'Bull','roles':('attack','defense'),'cooldown':8,'attack_speed':1.5,'attack_power':1.5,'counter_power':.5,'injury_turns':3,'breaks_wood':True,'implemented':False},
-    'ankle_breaker': {'name':'Ankle Breaker','roles':('defense',),'cooldown':5,'implemented':False},
-    'curse': {'name':'Nogokbin Curse','roles':('attack',),'unlock_turn':11,'uses_per_match':1,'implemented':False},
-    'infinity': {'name':'Infinity','roles':('defense',),'cooldown':8,'implemented':False},
-}
+FUTURE_SKILLS = {}  # All eight planned skills are now playable.
 SKILL_DESCRIPTIONS = {
  'brickwall':'Concrete anchor: size +75%, immobile, injury immune. Attack 2 turns / defense 1.',
  'tiger':'One shot: speed/power +200%, zero aim error, wood break and wind pressure.',
  'chain':'Hit an enemy then E to redirect. Up to 5 weaker follow-ups.',
  'cola':'Explode on stop. Sacrifice shooter unless it is your last marble.',
 }
+
+SKILL_DESCRIPTIONS.update({
+ 'bull':'Attack: +50% speed/power and breaks wood. Defense: stop enemy, step back, charge; half-power knockback + 3-turn injury.',
+ 'ankle_breaker':'Defense only: sidestep on contact with brief invulnerability. The attacker keeps travelling.',
+ 'curse':'Ultimate, once per match after turn 10: enemies tremble, then launch in random directions at full pull.',
+ 'infinity':'Defense only: slows approaching enemies to a stop before contact; immune to collision and wind.'})

@@ -26,7 +26,7 @@ PERKS = {
  'rat': Perk('Rat','Common','Size/toughness -30%, power +15%, speed +30%.',.7,1.3,1.15,.7),
  'sleeper': Perk('Sleeper Build','Rare','Size/toughness -15%, power +30%.',.85,1,1.3,.85),
  'curve': Perk('Curve Shot','Epic','While aiming: C cycles bend; C + wheel adjusts strength/direction.'),
- 'eyes': Perk('Eyes of Heaven','Legendary','Detect confirmed defense skill on attack. Cooldown: 8 turns.'),
+ 'eyes': Perk('Eyes of Heaven','Legendary','Reveal the exact marble and confirmed defense skill. Cooldown: 8 turns.'),
  'friendship': Perk('Power of Friendship','Epic','2+ clustered allies: +5% toughness per marble incl. self (max 25%, 95px).'),
 }
 

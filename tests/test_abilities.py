@@ -26,12 +26,12 @@ class SkillModelTests(unittest.TestCase):
         self.assertEqual(load.equipped(),'cola')
         self.assertFalse(load.ready('tiger',1))
 
-    def test_defense_only_brickwall(self):
-        self.assertTrue(can_prepare('brickwall',False))
+    def test_skill_attack_defense_roles(self):
+        attack={'brickwall','tiger','chain','cola','bull','curse'}
+        defense={'brickwall','bull','ankle_breaker','infinity'}
         for skill in SKILLS:
-            self.assertTrue(can_prepare(skill,True))
-            if skill != 'brickwall':
-                self.assertFalse(can_prepare(skill,False))
+            self.assertEqual(can_prepare(skill,True),skill in attack)
+            self.assertEqual(can_prepare(skill,False),skill in defense)
 
     def test_brickwall_immobile_and_bounce(self):
         a=sandbox(drag=.4)

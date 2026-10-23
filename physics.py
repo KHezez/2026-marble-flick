@@ -7,12 +7,13 @@ an egg is eliminated when its centre crosses the arena boundary.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from math import exp, hypot, sin, cos, ceil
+from math import exp, hypot, sin, cos, ceil, isfinite
 from typing import Optional
 import random
 from stats import TeamStats, shot_speed_multiplier, drag_resistance_multiplier, power_transfer_multiplier, collision_mass_multiplier, critical_chance, INJURY_TURNS
 
 from perks import factor, validate
+from combat import CombatRules
 
 # Tunable baseline for unupgraded eggs. Older prototype was far too slippery.
 # Full speed stat upgrades may later increase launch strength separately.
@@ -23,6 +24,7 @@ ARENA_BOUNDS = (360.0, 130.0, 560.0, 675.0)
 BASE_POWER_SCALE = 8.33  # drag 180 px => launch about 1500 px/s, previously 1800
 MAX_PULL = 180.0
 MIN_PULL = 14.0
+MAX_SPEED = 18000.0  # Bounds ricochet energy and adaptive substep cost in steel arenas.
 
 
 def vector_from_pull(egg_x: float, egg_y: float,
@@ -52,6 +54,10 @@ class Egg:
     chain_segment: int = 0
     chain_hit_segment: int = -1
 
+    bull: bool = False
+    defense: str = ""
+    guard_used: bool = False
+    invulnerable_until: float = 0.0
     curve: float = 0.0
     base_radius: float = 19.0
 
@@ -82,7 +88,7 @@ class Event:
 
 
 @dataclass
-class Arena:
+class Arena(CombatRules):
     left: float = ARENA_BOUNDS[0]
     top: float = ARENA_BOUNDS[1]
     width: float = ARENA_BOUNDS[2]
@@ -100,9 +106,15 @@ class Arena:
     _mud_period: int = -1
     rng: random.Random = field(default_factory=lambda: random.Random(21917))
     _contact_cooldowns: dict[tuple[int, int], float] = field(default_factory=dict)
+    _power_contacts: dict = field(default_factory=dict)
     _wind_seen: set[int] = field(default_factory=set)
     active_shooter_id: Optional[int] = None
 
+    zones: list = field(default_factory=list)
+    counters: list = field(default_factory=list)
+    boundary_walls: bool = False
+    walls_open: bool = False
+    map_key: str = 'classic'
     team_perks: dict = field(default_factory=lambda: {0: [], 1: []})
     turn_number: int = 1
     last_resort_used: set = field(default_factory=set)
@@ -129,7 +141,7 @@ class Arena:
 
     def cone(self, egg):
         from stats import accuracy_cone
-        return accuracy_cone(self.floor, self.team_stats[egg.team], egg.injury_turns > 0) / self.mult(egg.team, 'accuracy')
+        return accuracy_cone(self.terrain_at(egg.x,egg.y), self.team_stats[egg.team], egg.injury_turns > 0) / self.mult(egg.team, 'accuracy')
 
     def friendship(self, egg):
         if 'friendship' not in self.team_perks.get(egg.team, []): return 1.0
@@ -160,7 +172,10 @@ class Arena:
     def resolve_edges(self):
         self.check_survivors()
         for e in self.living():
-            if self.protected(e):
+            if self.boundary_walls and self.turn_number>=13 and not self.walls_open:
+                self.walls_open=True
+                self.events.append(Event('walls_open',self.left+self.width/2,self.top+self.height/2,-1,1.5))
+            if self.protected(e) or (self.boundary_walls and not self.walls_open):
                 if e.x < self.left+e.r: e.x=self.left+e.r; e.vx=abs(e.vx)*.83
                 if e.x > self.right-e.r: e.x=self.right-e.r; e.vx=-abs(e.vx)*.83
                 if e.y < self.top+e.r: e.y=self.top+e.r; e.vy=abs(e.vy)*.83
@@ -184,7 +199,7 @@ class Arena:
         return [e for e in self.eggs if e.alive and (team is None or e.team == team)]
 
     def moving(self) -> bool:
-        return any(e.speed >= STOP_SPEED for e in self.living())
+        return bool(self.counters) or any(e.speed >= STOP_SPEED for e in self.living())
 
     def finish_team_turn(self, team: int) -> None:
         """Injuries age only after their owner's next completed shooting turn."""
@@ -194,7 +209,7 @@ class Arena:
 
     def injure(self, egg_id: int, turns: int = INJURY_TURNS) -> bool:
         egg = next((e for e in self.living() if e.id == egg_id), None)
-        if egg is None or egg.injury_turns or egg.brickwall:
+        if egg is None or egg.injury_turns or egg.brickwall or self.invulnerable(egg):
             return False  # non-stacking injury
         egg.injury_turns = max(0, turns - (1 if "tungsten" in self.team_perks.get(egg.team, []) else 0))
         self.events.append(Event("injury", egg.x, egg.y, team=egg.team, strength=1.0))
@@ -227,7 +242,7 @@ class Arena:
             self.events.append(Event("brickwall_off", e.x, e.y, team=e.team))
 
     def _effective_mass(self, egg: Egg) -> float:
-        if egg.brickwall:
+        if egg.brickwall or egg.defense=="infinity":
             return float("inf")
         if egg.team == self.attacking_team and egg.speed >= 85.0:
             role = "attack"
@@ -253,19 +268,22 @@ class Arena:
         selected.curve = max(-1.5, min(1.5, curve)) if "curve" in self.team_perks.get(selected.team, []) else 0.0
         if ability == "tiger":
             launch_speed *= 3.0  # +200% speed
+        if ability == "bull":launch_speed *= 1.5
         for e in self.eggs:
+            e.bull = False
             e.tiger = e.chain = e.cola = False
             e.chain_ready = False
             e.chain_followups = 0
             e.chain_segment = 0
             e.chain_hit_segment = -1
+        selected.bull = ability == "bull"
         selected.tiger = ability == "tiger"
         selected.chain = ability == "chain"
         selected.cola = ability == "cola"
         self.active_shooter_id = selected.id
         self._wind_seen.clear()
         self.attacking_team = selected.team
-        self._contact_cooldowns.clear()
+        self._contact_cooldowns.clear();self._power_contacts.clear()
         selected.vx = dx / magnitude * launch_speed
         selected.vy = dy / magnitude * launch_speed
         return True
@@ -276,6 +294,7 @@ class Arena:
         magnitude = hypot(dx, dy)
         if not e or not e.chain or not e.chain_ready or e.chain_followups >= 5 or magnitude < 1.0:
             return False
+        self._power_contacts.clear()
         e.chain_followups += 1
         e.chain_segment += 1
         e.chain_ready = False
@@ -295,7 +314,7 @@ class Arena:
         e.cola = False
         radius = 177.0
         for other in self.living():
-            if other.id == e.id or other.brickwall:
+            if other.id == e.id or other.brickwall or self.invulnerable(other) or self.counter_locked(other):
                 continue
             dx, dy = other.x - e.x, other.y - e.y
             dist = hypot(dx, dy)
@@ -327,6 +346,7 @@ class Arena:
             for _ in range(count):
                 self.step(dt / count)
             return
+        for egg in self.living():self.limit_velocity(egg)
         # Bound travel by the smallest collider, including boosted Tiger/Rat shots.
         max_speed = max((e.speed for e in self.living()), default=0)
         min_radius = min((e.r for e in self.living()), default=19)
@@ -345,9 +365,10 @@ class Arena:
             drag = self.mud_drag
         else:
             drag = DRAG[self.floor]
+        self.update_combat(dt)
         eggs = self.living()
         for e in eggs:
-            if e.brickwall:
+            if e.brickwall or e.defense=="infinity" or self.counter_locked(e):
                 e.vx = e.vy = 0.0
                 continue
             if e.vx or e.vy:
@@ -357,7 +378,9 @@ class Arena:
                     e.vx,e.vy=e.vx*co-e.vy*si,e.vx*si+e.vy*co
                     e.curve *= exp(-1.2*dt)
                 resistance = drag_resistance_multiplier(self.team_stats[e.team], e.injury_turns > 0)
-                damp = exp(-drag * resistance * dt)
+                local_floor=self.terrain_at(e.x,e.y)
+                local_drag=drag if local_floor==self.floor or self.drag_override is not None else DRAG[local_floor]
+                damp = exp(-local_drag * resistance * dt)
                 e.vx *= damp
                 e.vy *= damp
                 if e.speed < STOP_SPEED:
@@ -373,7 +396,7 @@ class Arena:
         shooter = next((e for e in active if e.id == self.active_shooter_id and e.tiger), None)
         if shooter is not None and shooter.speed >= 100:
             for other in active:
-                if other.id == shooter.id or other.brickwall or other.id in self._wind_seen:
+                if other.id == shooter.id or other.brickwall or self.invulnerable(other) or self.counter_locked(other) or other.id in self._wind_seen:
                     continue
                 dx, dy = other.x - shooter.x, other.y - shooter.y
                 dist = hypot(dx, dy)
@@ -393,7 +416,17 @@ class Arena:
                     if obstacle.alive:
                         self._obstacle_collision(e, obstacle, emit=(iteration == 0))
 
+        self.update_combat(0)
         self.resolve_edges()
+
+    @staticmethod
+    def limit_velocity(egg):
+        speed=egg.speed
+        if not isfinite(speed):
+            # Defensive guard for externally corrupted/debug state.
+            egg.vx=egg.vy=0.
+        elif speed>MAX_SPEED:
+            egg.vx*=MAX_SPEED/speed;egg.vy*=MAX_SPEED/speed
 
     def _egg_collision(self, a: Egg, b: Egg, emit: bool) -> None:
         dx, dy = b.x - a.x, b.y - a.y
@@ -401,6 +434,7 @@ class Arena:
         dist2 = dx * dx + dy * dy
         if dist2 >= min_dist * min_dist:
             return
+        if self.pre_collision_guard(a,b):return
         dist = dist2 ** 0.5
         if dist <= 1e-8:
             nx, ny, dist = 1.0, 0.0, 0.0
@@ -444,8 +478,11 @@ class Arena:
             striker, victim = a, b
         elif b.team == self.attacking_team and b_forward < a_forward and b_forward < -80:
             striker, victim = b, a
-        if striker is not None:
+        key=tuple(sorted((a.id,b.id)))
+        if striker is not None and self.elapsed-self._power_contacts.get(key,-1e8)>=.08:
+            self._power_contacts[key]=self.elapsed
             transfer = power_transfer_multiplier(self.team_stats[striker.team], striker.injury_turns > 0) * self.mult(striker.team, "power")
+            if striker.bull:transfer *= 1.5
             if striker.tiger:
                 transfer *= 3.0  # +200% POWER
             if striker.chain:
@@ -454,6 +491,7 @@ class Arena:
             direction = 1.0 if victim is b else -1.0
             victim.vx += nx * extra * direction
             victim.vy += ny * extra * direction
+        self.limit_velocity(a);self.limit_velocity(b)
         if emit and -vn > 65:
             if a.brickwall or b.brickwall:
                 self.events.append(Event("brickwall_hit", (a.x+b.x)/2, (a.y+b.y)/2,
@@ -503,7 +541,7 @@ class Arena:
         vn = e.vx * nx + e.vy * ny
         impact = max(0.0, -vn)
 
-        if emit and box.material == "wood" and e.tiger:
+        if emit and box.material == "wood" and (e.tiger or e.bull):
             box.alive = False
             self.events.append(Event("wood_break", closest_x, closest_y, strength=1.0))
             return

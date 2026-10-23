@@ -30,8 +30,8 @@ class GameIntegrationTests(unittest.TestCase):
         self.assertGreater(g.menu.draw_time,0);g.update(1.5);g.draw_menu()
         self.assertEqual(len(g.profile['history']),1)
         self.click('page','home');self.click('page','inventory')
-        self.click('item',('passive','heavy'));self.click('equip',('passive','heavy'))
-        self.click('stat',('power',5));self.assertEqual(active(g.profile)['stats']['power'],5)
+        self.click('slot',('passive',0));self.click('item',('passive','heavy'));self.click('equip',('passive','heavy'))
+        self.click('tab','stats');self.click('stat',('power',5));self.assertEqual(active(g.profile)['stats']['power'],5)
         self.click('page','home');self.click('page','setup');self.click('count',4);self.click('start')
         self.assertEqual(g.state,'aim');g.draw_hud()
         self.assertEqual(g._stat_sliders,[]);self.assertEqual(g.arena.team_perks[0],['heavy'])
@@ -44,11 +44,11 @@ class GameIntegrationTests(unittest.TestCase):
         g._finish_turn();self.assertEqual(g.profile['coins'],before+100)
         self.assertEqual(g.store.load()['red_loadout']['stats']['toughness'],20)
         g.draw_hud()
-    def test_dev_currency_gated_and_tab_pass(self):
+    def test_local_test_currency_always_enabled_and_tab_pass(self):
         g=self.g;before=g.profile['coins'];g.development=False
         ev=pygame.event.Event(pygame.KEYDOWN,key=pygame.K_p)
-        g.handle_event(ev);self.assertEqual(g.profile['coins'],before)
-        g.development=True;g.handle_event(ev);self.assertEqual(g.profile['coins'],before+1000)
+        g.handle_event(ev);self.assertEqual(g.profile['coins'],before+1000)
+        g.development=True;g.handle_event(ev);self.assertEqual(g.profile['coins'],before+2000)
         g.start_match();g.handle_event(pygame.event.Event(pygame.KEYDOWN,key=pygame.K_TAB))
         self.assertEqual(g.turn_number,2)
     def test_curve_controls_only_equipped_and_curve_locked(self):
@@ -113,10 +113,14 @@ class GameIntegrationTests(unittest.TestCase):
         path=Path(self.tmp.name)/'theme.png';pygame.image.save(image,path)
         g.menu.themes['main_menu']=pygame.transform.smoothscale(pygame.image.load(str(path)),(1280,900))
         g.menu.go('home');g.draw_menu()
-    def test_future_skills_not_equip_or_draw_candidates(self):
-        for key in FUTURE_SKILLS:
-            self.assertFalse(can_prepare(key,True))
-            with self.assertRaises(ValueError):SkillLoadout().equip(0,key)
+    def test_all_eight_planned_skills_released(self):
+        from abilities import SKILLS
+        from economy import SKILL_RARITIES
+        self.assertEqual(len(SKILLS),8);self.assertFalse(FUTURE_SKILLS)
+        self.assertEqual(set(SKILLS),set(SKILL_RARITIES))
+        for key in SKILLS:
+            self.assertTrue(can_prepare(key,True) or can_prepare(key,False))
+
     def test_cpu_and_local_full_turn_paths(self):
         g=self.g
         for mode in ('easy','normal','hard','off'):

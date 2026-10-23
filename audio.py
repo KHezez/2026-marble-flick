@@ -24,7 +24,19 @@ SFX = {
  'lock':('turn_lock','준비 확정'), 'reveal':('reveal','동시 공개'),
  'countdown':('countdown','준비 시간 마지막 5초'),
 }
-MUSIC={k:k+'.mp3' for k in ('main_menu','shop','inventory','match')}
+SFX.update({
+ 'bull_charge':('bull_charge','불 공격 돌진'), 'bull_ready':('bull_ready','불 방어 공개'),
+ 'bull_freeze':('bull_freeze','카운터 대상 정지'), 'bull_counter':('bull_counter','뒤로 빠지는 카운터 준비'),
+ 'bull_impact':('bull_impact','카운터 들이받기'), 'ankle_breaker_ready':('ankle_ready','앵클 브레이커 공개'),
+ 'ankle_dodge':('ankle_dodge','접촉 회피'), 'infinity_ready':('infinity_ready','무하한 영역 공개'),
+ 'infinity_stop':('infinity_stop','무하한에 접근한 적 감속'), 'curse_charge':('curse_charge','저주 떨림 시전'),
+ 'curse_release':('curse_release','저주 무작위 가속 시작'), 'curse_launch':('curse_launch','저주로 개별 공 가속'),
+ 'eyes_activate':('eyes_activate','천안 감지·대상 공 강조'), 'skin_draw':('skin_draw','스킨 뽑기 결과'),
+ 'walls_open':('walls_open','13턴 강철 경계벽 개방'),
+})
+MUSIC={k:k+'.mp3' for k in ('main_menu','shop','inventory','match','settings','battle_desert','battle_jungle','battle_barricade','battle_steel','battle_ice','clutch','curse')}
+MUSIC_FALLBACK={'settings':'main_menu','clutch':'match','curse':'match',**{k:'match' for k in MUSIC if k.startswith('battle_')}}
+
 
 class SoundBox:
     FILES={k:v[0]+'.mp3' for k,v in SFX.items()}
@@ -38,7 +50,7 @@ class SoundBox:
             except pygame.error as exc: LOG.error('Audio device unavailable: %s',exc)
         if pygame.mixer.get_init():
             pygame.mixer.set_num_channels(32)
-            pygame.mixer.set_reserved(4)
+            pygame.mixer.set_reserved(8)
         for i,(name,filename) in enumerate(self.FILES.items()):
             path=self.root/'sfx'/filename
             try:
@@ -52,7 +64,7 @@ class SoundBox:
                 self.diagnostics[name]=f'fallback: {exc}'
                 LOG.warning('%s: %s',path,self.diagnostics[name])
             self.fallback[name]=self._tone(160+i*24)
-        LOG.info('Mixer=%s; channels=32, reserved=4; SFX volume=%s',pygame.mixer.get_init(),self.sfx_volume)
+        LOG.info('Mixer=%s; channels=32, reserved=8; SFX volume=%s',pygame.mixer.get_init(),self.sfx_volume)
 
     def _tone(self,freq):
         init=pygame.mixer.get_init()
@@ -70,12 +82,12 @@ class SoundBox:
         sound=self.samples.get(name) or self.fallback.get(name)
         if sound is None:
             LOG.error('No sample or fallback: %s',name);return None
-        reserved={'cola_charge':0,'cola_explosion':1,'clutch':2,'victory':3,'defeat':3}
-        channel=pygame.mixer.Channel(reserved[name]) if name in reserved else next((pygame.mixer.Channel(i) for i in range(4,32) if not pygame.mixer.Channel(i).get_busy()),None)
+        reserved={'cola_charge':0,'cola_explosion':1,'clutch':2,'victory':3,'defeat':3,'eyes_activate':4,'curse_charge':5,'curse_release':6,'bull_impact':7}
+        channel=pygame.mixer.Channel(reserved[name]) if name in reserved else next((pygame.mixer.Channel(i) for i in range(8,32) if not pygame.mixer.Channel(i).get_busy()),None)
         if channel is None:
             LOG.warning('SFX channels exhausted: %s; replacing oldest nonreserved channel',name)
             # Never steal a reserved charge/explosion/result channel.
-            channel=pygame.mixer.Channel(4)
+            channel=pygame.mixer.Channel(8)
         channel.set_volume(self.sfx_volume)
         channel.play(sound)
         LOG.debug('play %s volume=%.2f busy=%s',name,self.sfx_volume,channel.get_busy())
@@ -97,9 +109,15 @@ class SoundBox:
             self.fade_left-=dt
             if self.fade_left<=0:
                 scene=self.pending_music; self.pending_music=None
-                path=self.root/'music'/MUSIC[scene]
+                path=self.root/'music'/MUSIC.get(scene,scene+'.mp3')
+                if not path.is_file() and scene in MUSIC_FALLBACK:
+                    path=self.root/'music'/MUSIC[MUSIC_FALLBACK[scene]]
                 if path.is_file():
                     try:
-                        pygame.mixer.music.load(str(path)); pygame.mixer.music.play(-1,fade_ms=500)
+                        # Some downloaded .mp3 files actually contain Ogg/WAV data.
+                        # Use the real stream signature so dr_mp3 never receives Ogg.
+                        with path.open('rb') as stream:header=stream.read(12)
+                        hint='ogg' if header.startswith(b'OggS') else 'wav' if header.startswith(b'RIFF') else 'flac' if header.startswith(b'fLaC') else 'mp3'
+                        pygame.mixer.music.load(str(path),namehint=hint); pygame.mixer.music.play(-1,fade_ms=500)
                     except (pygame.error,OSError) as exc:LOG.warning('BGM %s: %s',path,exc)
                 else: LOG.info('Optional BGM missing: %s',path)

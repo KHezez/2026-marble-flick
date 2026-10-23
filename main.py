@@ -1,4 +1,4 @@
-"""MARBLE FLICK v0.6 — passives, persistent loadouts, arcade menus.
+"""MARBLE FLICK v0.7 — passives, persistent loadouts, arcade menus.
 
 Controls
 --------
@@ -9,7 +9,7 @@ R: rematch              ESC: configuration menu
 M: mute/unmute
 
 Version 0.6 preserves the v0.5 physics and turn loop with pre-match loadouts.
-P grants test currency only when launched with --dev.
+P grants 1000 test Coins in this local test version.
 """
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 
 try:
-    import pygame
+    import pygame  # type: ignore[import-not-found]
 except ImportError:
     print("Pygame is not installed. Run: python -m pip install -r requirements.txt")
     raise SystemExit(1)
@@ -42,6 +42,9 @@ from economy import reward
 from effects import ImpactFX
 from ui import MenuUI, battle_panel
 from stats import TeamStats
+from localization import tr
+from maps import apply_map, MAPS, music_for
+from skins import paint as paint_skin
 
 SCREEN_W, SCREEN_H = 1280, 900
 ARENA_RECT = pygame.Rect(*ARENA_BOUNDS)
@@ -50,11 +53,11 @@ FIXED_DT = 1 / 240
 TURN_SECONDS = 25.0
 DRAG_LENGTH = MAX_PULL
 
-BG = (193, 233, 255)
-PANEL = (239, 250, 255)
-PANEL_LIGHT = (219, 240, 255)
-TEXT = (27, 65, 102)
-MUTED = (67, 104, 139)
+BG = (14, 19, 43)
+PANEL = (24, 33, 65)
+PANEL_LIGHT = (35, 52, 91)
+TEXT = (240, 246, 255)
+MUTED = (174, 193, 220)
 BLUE = (81, 194, 255)
 RED = (255, 118, 116)
 GOLD = (255, 206, 115)
@@ -75,8 +78,9 @@ def clamp(n, lo, hi):
 
 
 def make_font(size, bold=False):
-    # Game's English labels allow Pygame's bundled fallback everywhere.
-    font = pygame.font.SysFont("segoeui,arial,dejavusans", size, bold=bold)
+    path=Path(__file__).resolve().parent/'assets/fonts'/('NotoSansKR-Bold.ttf' if bold else 'NotoSansKR-Regular.ttf')
+    font=pygame.font.Font(str(path),size) if path.is_file() else pygame.font.SysFont('malgungothic,arial',size)
+    font.set_bold(False)
     return font
 
 
@@ -96,17 +100,17 @@ class Game:
     def __init__(self):
         pygame.mixer.pre_init(44100, -16, 1, 256)
         pygame.init()
-        pygame.display.set_caption("Marble Flick v0.6")
+        pygame.display.set_caption("Marble Flick v0.7")
         self.screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
         self.clock = pygame.time.Clock()
         self.fonts = {
             "hero": make_font(64, True),
-            "title": make_font(28, True),
-            "heading": make_font(20, True),
-            "body": make_font(16, False),
-            "body_b": make_font(16, True),
-            "small": make_font(13, False),
-            "micro": make_font(11, True),
+            "title": make_font(32, True),
+            "heading": make_font(24, True),
+            "body": make_font(20, False),
+            "body_b": make_font(20, True),
+            "small": make_font(18, False),
+            "micro": make_font(16, True),
         }
         self.sound = SoundBox()
         self.store=SaveStore()
@@ -122,6 +126,8 @@ class Game:
         self.sound.muted=self.profile['audio']['muted']
         self.sound.music('main_menu');self.sound.play('menu')
         self.state = "menu"  # menu | aim | moving | over
+        self.map_key="classic"; self.curse_timer=0.; self.eyes_targets={}; self.eyes_flash=0.
+        self.clutch_music=False; self._settings_return_state=None
         self.count = 10
         self.floor = "normal"
         self.obstacles = "none"
@@ -167,10 +173,36 @@ class Game:
         self.brick_expiry = {}  # egg_id -> last attack turn on which it is active
 
     def label(self, text, x, y, font="body", color=TEXT, align="topleft", target=None):
-        surf = self.fonts[font].render(str(text), True, color)
+        surf = self.fonts[font].render(tr(str(text),getattr(self,"profile",{}).get("settings",{}).get("language","en")), True, color)
         rect = surf.get_rect(**{align: (round(x), round(y))})
         (target or self.screen).blit(surf, rect)
         return rect
+
+    def fit_label(self,text,rect,font='body',color=TEXT):
+        rect=pygame.Rect(rect);text=tr(str(text),self.profile['settings']['language'])
+        f=self.fonts[font]
+        # Keep legibility: wrap long item names rather than shrinking to tiny type.
+        if f.size(text)[0]>rect.w:
+            return self.wrap_label(text,rect,font,color,center=True)
+        return self.label(text,*rect.center,font,color,'center')
+
+    def wrap_label(self,text,rect,font='body',color=TEXT,center=False):
+        rect=pygame.Rect(rect);text=tr(str(text),self.profile['settings']['language'])
+        f=self.fonts[font];lines=[];line=''
+        for char in text:
+            if char=='\n' or (line and f.size(line+char)[0]>rect.w):
+                lines.append(line);line='' if char=='\n' else char
+            else:line+=char
+        if line:lines.append(line)
+        step=f.get_linesize()
+        old=self.screen.get_clip();self.screen.set_clip(rect)
+        for i,line in enumerate(lines):
+            self.label(line,rect.centerx if center else rect.x,rect.y+i*step,font,color,'midtop' if center else 'topleft')
+        self.screen.set_clip(old)
+
+    def sync_music(self):
+        if hasattr(self.sound,'music') and self.arena:
+            self.sound.music('curse' if self.state=='curse' else music_for(self.arena,getattr(self,'clutch_music',False)))
 
     def rounded(self, rect, fill, radius=12, stroke=None, width=1, target=None):
         surface = self.screen if target is None else target
@@ -205,6 +237,7 @@ class Game:
                 validate(load['perks'],self.count)
             self.loadouts={0:SkillLoadout(list(active(self.profile)['skills'])),1:SkillLoadout(list(self.red_loadout['skills']))}
         self.arena = make_match(self.count, self.floor, self.obstacles)
+        apply_map(self.arena,getattr(self,"map_key","classic"))
         if hasattr(self,'profile'):
             for team,load in ((0,active(self.profile)),(1,self.red_loadout)):
                 self.arena.team_stats[team]=TeamStats(**load['stats'])
@@ -212,9 +245,11 @@ class Game:
             self.store.save(self.profile)
         self.curve=0.;self.locked_curve=0.;self.eyes_ready={0:1,1:1};self.eyes_notice={}
         self.rewarded=False;self.reward_amount=0
-        if hasattr(self,'fx'):self.fx=ImpactFX()
+        self.eyes_targets={};self.eyes_flash=0.;self.curse_timer=0.;self.clutch_music=False
+        if hasattr(self,'fx'):
+            self.fx.restore_window();self.fx=ImpactFX()
         self.sound.play('match')
-        if hasattr(self.sound,'music'):self.sound.music('match')
+        if hasattr(self.sound,'music'):self.sound.music(music_for(self.arena))
         self.board = self._make_board(self.floor)
         self.state = "aim"
         self.turn = 0
@@ -288,7 +323,8 @@ class Game:
         pygame.draw.line(surf, (104, 124, 141), (0, h//2), (w, h//2), 2)
         pygame.draw.circle(surf, (89, 113, 128), (w//2, h//2), 66, 2)
         pygame.draw.circle(surf, (89, 113, 128), (w//2, h//2), 5)
-        path=Path(__file__).resolve().parent/'assets'/'themes'/('arena_'+floor+'.png')
+        texture=MAPS.get(getattr(self,'map_key','classic'),MAPS['classic'])[2] if getattr(self,'map_key','classic')!='classic' else floor
+        path=Path(__file__).resolve().parent/'assets'/'themes'/('arena_'+texture+'.png')
         if path.is_file():
             try: surf=pygame.transform.smoothscale(pygame.image.load(str(path)).convert(),(w,h))
             except (pygame.error,OSError) as exc:logging.warning('Theme %s: %s',path,exc)
@@ -317,10 +353,10 @@ class Game:
         skill = self.loadouts[team].equipped()
         if not skill:return
         if not self.loadouts[team].ready(skill, self.turn_number):
-            self.banner("SKILL ON COOLDOWN", 1.2)
+            self.banner("CURSE: TURN 11+, ONCE PER MATCH" if skill=="curse" else "SKILL ON COOLDOWN", 1.8)
             return
         if not can_prepare(skill, team == self.turn):
-            self.banner("ATTACK SKILL: NOT AVAILABLE IN DEFENSE", 1.6)
+            self.banner("SKILL NOT AVAILABLE ON THIS TURN", 1.6)
             return
         if egg.team != team or egg.brickwall:
             return
@@ -362,7 +398,9 @@ class Game:
         if skill and 'eyes' in self.arena.team_perks.get(team,[]) and self.turn_number>=self.eyes_ready[team]:
             self.eyes_ready[team]=self.turn_number+8
             self.eyes_notice[team]=SKILL_NAMES[skill.name]
-            self.sound.play('passive')
+            if not hasattr(self,'eyes_targets'):self.eyes_targets={}
+            self.eyes_targets[team]=skill.egg_id;self.eyes_flash=1.15
+            self.sound.play('eyes_activate')
             if self.cpu_mode=='off' or team==0:self.banner('EYES OF HEAVEN: '+SKILL_NAMES[skill.name],3)
 
     def ready_defense(self):
@@ -381,14 +419,15 @@ class Game:
             return
         # Choose from publicly available positions, not the concealed human aim.
         candidates = self.arena.living(1)
-        skill = "brickwall"
-        if candidates and self.loadouts[1].ready(skill, self.turn_number):
+        options=[s for s in self.loadouts[1].slots if can_prepare(s,False) and self.loadouts[1].ready(s,self.turn_number)]
+        skill=self.rng.choice(options) if options else None
+        if candidates and skill and self.loadouts[1].ready(skill, self.turn_number):
             risk = sorted(candidates, key=lambda e: (
                 min(e.x-self.arena.left, self.arena.right-e.x, e.y-self.arena.top, self.arena.bottom-e.y),
                 min(math.hypot(e.x-b.x, e.y-b.y) for b in self.arena.living(0))
                 if self.arena.living(0) else 9999))
             if risk and self.rng.random() < (.40 if self.cpu_mode == "easy" else .75):
-                self.prepared[1] = PreparedSkill("brickwall", risk[0].id)
+                self.prepared[1] = PreparedSkill(skill, risk[0].id)
         self.defense_ready = True
         self.detect_defense()
 
@@ -398,7 +437,7 @@ class Game:
         selected = next((e for e in self.arena.living(1) if e.id == shot.egg_id), None)
         if selected is None:
             return
-        options = [s for s in self.loadouts[1].slots if self.loadouts[1].ready(s, self.turn_number)]
+        options = [s for s in self.loadouts[1].slots if self.loadouts[1].ready(s, self.turn_number) and can_prepare(s,True)]
         # CPU offensive loadout is editable from the SKILL LAB panel.
         if options and self.rng.random() < .76:
             offensive = [s for s in options if s != "brickwall"]
@@ -419,6 +458,7 @@ class Game:
         self.arena.check_survivors()
         self.process_clutch()
         self.arena.finish_team_turn(self.turn)
+        self.arena.clear_defenses()
         for egg_id, expiry in list(self.brick_expiry.items()):
             if self.turn_number >= expiry:
                 self.arena.deactivate_brickwall(egg_id)
@@ -435,7 +475,7 @@ class Game:
         self.turn = 1 - self.turn
         self.turn_number += 1
         self.arena.turn_number=self.turn_number
-        self.curve=0.;self.locked_curve=0.;self.eyes_notice={}
+        self.curve=0.;self.locked_curve=0.;self.eyes_notice={};self.eyes_targets={}
         self.turn_left = TURN_SECONDS
         self.state = "aim"
         self.locked_attack = None
@@ -473,6 +513,8 @@ class Game:
                 if not self.arena.activate_brickwall(selected.id):
                     continue
                 self.brick_expiry[selected.id] = self.turn_number + (1 if team == attacker else 0)
+            if team==defender and active.name in ("bull","ankle_breaker","infinity"):
+                if not self.arena.activate_defense(selected.id,active.name):continue
             self.loadouts[team].commit(active.name, self.turn_number)
         egg_id, dx, dy = self.locked_attack
         selected = next((e for e in self.arena.living(attacker) if e.id == egg_id), None)
@@ -481,6 +523,10 @@ class Game:
             return
         active = self.prepared[attacker]
         ability = active.name if active and active.egg_id == egg_id and active.name != "brickwall" else ""
+        if ability=="curse":
+            self.state="curse";self.curse_timer=1.8;self.sound.play("curse_charge");self.sync_music()
+            self.banner("CURSE UNLEASHED!",1.8)
+            return
         cone = 0.0 if ability == "tiger" else self.arena.cone(selected)
         dx, dy, deviation = apply_shot_error(dx, dy, cone, self.rng)
         self.last_deviation = deviation
@@ -491,7 +537,7 @@ class Game:
         self.travel_time = 0.0
         self.settle_time = 0.0
         self.accumulator = 0.0
-        self.sound.play({"tiger":"tiger", "chain":"chain", "cola":"cola_charge"}.get(ability, "shoot"))
+        self.sound.play({"tiger":"tiger", "chain":"chain", "cola":"cola_charge", "bull":"bull_charge"}.get(ability, "shoot"))
         if cone:
             self.banner(f"AIM ERROR: {deviation:+.2f} DEG", .9)
         else:
@@ -523,6 +569,7 @@ class Game:
                 for skill in self.loadouts[ev.team].slots:self.loadouts[ev.team].ready_at[skill]=self.turn_number
                 # Convert after processing so repeated checks never reset twice.
                 ev.kind='clutch_fx'
+                self.clutch_music=True;self.sync_music()
 
     def spawn_effect(self, ev: Event):
         if hasattr(self,'fx'):
@@ -532,7 +579,11 @@ class Game:
             self.sound.play('clutch' if ev.kind=='clutch_fx' else 'passive')
             self.banner(('CLUTCH! SKILLS RESET' if ev.kind=='clutch_fx' else 'LAST RESORT! EDGE SHIELD'),2.5)
             return
-        if ev.kind in ("injury", "cola_explosion"):
+        if ev.kind in ('bull_ready','bull_freeze','bull_counter','bull_impact','ankle_breaker_ready','ankle_dodge','infinity_ready','infinity_stop','curse_launch','walls_open'):
+            self.sound.play(ev.kind)
+            if ev.kind=='walls_open':self.banner('STEEL WALLS OPEN!',3)
+            color,px,py,count,life=(200,100,255),ev.x,ev.y,24,.55
+        elif ev.kind in ("injury", "cola_explosion"):
             color = (225, 46, 67) if ev.kind == "injury" else (241, 85, 82)
             px, py, count, life = ev.x, ev.y, 35 if ev.kind == "cola_explosion" else 19, .8
             self.sound.play("cola_explosion" if ev.kind == "cola_explosion" else "injury")
@@ -572,11 +623,14 @@ class Game:
         if hasattr(self.sound,'update'):self.sound.update(dt)
         if hasattr(self,'menu'):self.menu.update(dt)
         if hasattr(self,'fx'):
-            freeze=self.fx.freeze>0
+            self.fx.configure(getattr(self,'profile',{}).get('settings',{}))
+            self.fx.allow_window_motion=self.state in ('moving','curse') and not self.chain_window
+            freeze=self.fx.freeze>0 and self.fx.settings.get('hit_stop',True)
             self.fx.update(dt)
             if freeze and self.state=='moving':return
         self.mouse = pygame.mouse.get_pos() if pygame.display.get_init() else self.mouse
         self.status_life = max(0.0, self.status_life-dt)
+        self.eyes_flash=max(0.,getattr(self,"eyes_flash",0.)-dt)
         for p in self.particles:
             p.life -= dt
             p.x += p.vx*dt
@@ -609,6 +663,11 @@ class Game:
             self.reveal_timer -= dt
             if self.reveal_timer <= 0:
                 self._launch_revealed()
+        elif self.state == 'curse' and self.arena:
+            self.curse_timer-=dt
+            if self.curse_timer<=0:
+                self.arena.cast_curse(self.turn);self.sound.play('curse_release')
+                self.state='moving';self.travel_time=0.;self.settle_time=0.;self.accumulator=0.;self.sync_music()
         elif self.state == "moving" and self.arena:
             self.travel_time += dt
             if self.chain_window > 0.0:
@@ -723,7 +782,8 @@ class Game:
 
     def _skill_ui_action(self, action, arg):
         if action == "slot":
-            self.loadouts[self.edit_team].select_slot(int(arg))
+            team=self._input_team()
+            if team is not None:self.loadouts[team].select_slot(int(arg))
         elif action == "equip":
             try:
                 current = self.loadouts[self.edit_team].equipped()
@@ -742,12 +802,13 @@ class Game:
             return False
         if hasattr(self,'menu'):
             if event.type==pygame.KEYDOWN and event.key==pygame.K_p:
-                if self.development:
-                    self.profile['coins']+=1000;self.menu.persist();self.banner('DEV: +1000 Coins')
+                self.profile['coins']+=1000;self.menu.persist();self.banner('+1000 Coins')
                 return True
+            if event.type==pygame.KEYDOWN and event.key==pygame.K_F10 and self.state!='menu':
+                self._settings_return_state=self.state;self.state='menu';self.dragging_id=None;self.fx.shake=0.;self.fx.restore_window();self.menu.go('settings');return True
             if self.state=='menu':return self.menu.event(event)
             if event.type==pygame.KEYDOWN and event.key==pygame.K_ESCAPE:
-                self.state='menu';self.dragging_id=None;self.menu.go('home');return True
+                self.state='menu';self.dragging_id=None;self._settings_return_state=None;self.fx.shake=0.;self.fx.restore_window();self.menu.go('home');return True
             if event.type==pygame.KEYDOWN and event.key==pygame.K_c and self.state=='aim' and self._input_is_attacker() and 'curve' in self.arena.team_perks[self.turn]:
                 self.curve={0.:.75,.75:1.5,1.5:-1.5,-1.5:-.75,-.75:0.}.get(self.curve,0.)
             if event.type==pygame.MOUSEWHEEL and self.state=='aim' and self._input_is_attacker() and 'curve' in self.arena.team_perks[self.turn] and pygame.key.get_pressed()[pygame.K_c]:
@@ -841,8 +902,17 @@ class Game:
 
     def draw_global_background(self):
         self.screen.fill(BG)
-        pygame.draw.circle(self.screen, (225, 249, 255), (190, -75), 240)
-        pygame.draw.circle(self.screen, (164, 218, 251), (1170, 825), 320)
+        pygame.draw.circle(self.screen, (27, 35, 68), (190, -75), 240)
+        pygame.draw.circle(self.screen, (31, 39, 81), (1170, 825), 320)
+
+    def curse_background(self,size):
+        if self.state!='curse':return None
+        image=self.menu.assets.image('themes/노곡빈.png')
+        if image:
+            key=('curse',tuple(size))
+            if key not in self.menu.assets.scaled:self.menu.assets.scaled[key]=pygame.transform.smoothscale(image,size)
+            return self.menu.assets.scaled[key]
+        return None
 
     def draw_menu(self):
         self.menu.render()
@@ -864,6 +934,9 @@ class Game:
         pygame.draw.circle(self.screen, blend(color,WHITE,.35), (x,y), r, 2)
         pygame.draw.circle(self.screen, blend(color,WHITE,.40), (x-r//4,y-r//3), max(3,r//3))
         pygame.draw.circle(self.screen, blend(color,WHITE,.06), (x,y+3), max(4,r//2))
+        if not brick and hasattr(self,'profile'):
+            load=active(self.profile) if team==0 else self.red_loadout
+            paint_skin(self.screen,pygame.Rect(x-r,y-r,2*r,2*r),load.get('skin','classic'),team)
         if injured:
             pygame.draw.line(self.screen, (232,69,84), (x-r//3,y-r//2),(x+3,y+r//4),2)
         if brick:
@@ -877,7 +950,20 @@ class Game:
             return
         surround = ARENA_RECT.inflate(14, 14)
         self.rounded(surround, (12, 23, 33), 14, (80, 111, 134), 2)
-        self.screen.blit(self.board, ARENA_RECT.topleft)
+        back=self.curse_background(ARENA_RECT.size)
+        self.screen.blit(back if back is not None else self.board, ARENA_RECT.topleft)
+        if self.state=='curse' and back is None:
+            haze=pygame.Surface(ARENA_RECT.size,pygame.SRCALPHA);haze.fill((100,0,145,130));self.screen.blit(haze,ARENA_RECT)
+        for zone in self.arena.zones:
+            rect=pygame.Rect(zone.x,zone.y,zone.w,zone.h)
+            tile=pygame.Surface(rect.size,pygame.SRCALPHA)
+            color=(80,205,255) if zone.floor=='ice' else (120,72,29)
+            pygame.draw.rect(tile,(*color,165),tile.get_rect(),border_radius=18)
+            pygame.draw.rect(tile,(*color,240),tile.get_rect(),3,border_radius=18)
+            self.screen.blit(tile,rect)
+            self.label('ICE' if zone.floor=='ice' else 'MUD',rect.centerx,rect.centery,'small',WHITE,'center')
+        if self.arena.boundary_walls and not self.arena.walls_open:
+            pygame.draw.rect(self.screen,(170,190,213),ARENA_RECT.inflate(10,10),7,border_radius=5)
         pygame.draw.rect(self.screen, (120, 145, 157), ARENA_RECT, 2)
         # Accent corner guides mark the actual, deadly, boundary.
         for x, sx in ((ARENA_RECT.left,1),(ARENA_RECT.right,-1)):
@@ -933,13 +1019,25 @@ class Game:
                 if near[0] <= 28*28:
                     hover = near[1]
         for e in self.arena.living():
-            self.draw_egg_disc(e.x,e.y,e.r,e.team,e.id % self.count + 1,
+            tremble=math.sin(self.frame*2.4+e.id)*4 if self.state=='curse' and e.team!=self.turn else 0
+            self.draw_egg_disc(e.x+tremble,e.y,e.r,e.team,e.id % self.count + 1,
                                selected=(self.dragging_id == e.id),
                                hovered=(hover == e.id and self.dragging_id is None),
                                injured=(e.injury_turns > 0), inspected=(self.inspect_id == e.id),
                                brick=e.brickwall,
                                skill=(next((p.name for p in self.prepared.values() if p and p.egg_id==e.id),None)
                                       if (self.state == "reveal" or e.team == self._input_team()) else None))
+            revealed=self.state in ('reveal','moving','curse')
+            prep=next((p.name for p in self.prepared.values() if p and p.egg_id==e.id),None)
+            defense=e.defense or (prep if revealed else '')
+            if revealed and defense in ('bull','infinity'):
+                radius=e.r+(75 if defense=='bull' else 130)
+                pygame.draw.circle(self.screen,(255,105,50) if defense=='bull' else (95,115,255),(round(e.x),round(e.y)),int(radius),2)
+            if getattr(self,'eyes_targets',{}).get(self.turn)==e.id and (self.cpu_mode=='off' or self.turn==0):
+                pulse=8+int(4*math.sin(self.frame*.22));pos=(round(e.x),round(e.y))
+                pygame.draw.circle(self.screen,(255,40,220),pos,int(e.r+pulse),6)
+                pygame.draw.line(self.screen,(255,255,255),(pos[0]-e.r-15,pos[1]),(pos[0]+e.r+15,pos[1]),2)
+                self.label('LOCK ON: '+self.eyes_notice[self.turn],clamp(e.x,490,790),e.y-e.r-40,'body_b',(255,45,230),'center')
             if self.arena.protected(e):
                 pygame.draw.circle(self.screen,GOLD,(round(e.x),round(e.y)),int(e.r+8),3)
             if self.arena.friendship(e)>1:
@@ -1044,10 +1142,12 @@ class Game:
         if not self.arena:
             return
         self.draw_global_background()
+        curse_bg=self.curse_background((SCREEN_W,SCREEN_H))
+        if curse_bg is not None:self.screen.blit(curse_bg,(0,0))
         self.label("MARBLE FLICK",37,23,"title",TEXT)
-        self.label("PASSIVES + SKILLS  /  V0.6",38,59,"small",MUTED)
-        self.label(f"{self.count}v{self.count}  |  {self.floor.upper()}  |  {self.obstacles.upper()}",
-                   SCREEN_W-36,31,"body_b",TEXT,"topright")
+        self.label("PASSIVES + SKILLS  /  V0.7",38,59,"small",MUTED)
+        lang=self.profile['settings']['language'];map_name=MAPS[self.arena.map_key][0 if lang=='ko' else 1]
+        self.label(f"{self.count}v{self.count}  |  {map_name}",SCREEN_W-36,31,'body_b',TEXT,'topright')
         self.label(f"TURN {self.turn_number}",SCREEN_W-36,60,"small",MUTED,"topright")
         active_color=BLUE if self.turn==0 else RED
         if self.state=="aim":
@@ -1069,14 +1169,14 @@ class Game:
         self.draw_board()
         if hasattr(self,'fx'):
             self.fx.draw(self.screen)
-            if self.state=='moving':self.fx.camera(self.screen,ARENA_RECT,self.frame)
+            if self.state in ('moving','curse') and not self.chain_window:self.fx.camera(self.screen,ARENA_RECT,self.frame)
         self.draw_stat_lab()
         pygame.draw.line(self.screen,(43,59,76),(36,831),(1244,831),1)
         if self.state=="aim":
             if self._input_is_attacker():
                 msg="ATTACK: DRAG + RELEASE TO LOCK (DOES NOT FIRE YET)"
             elif self._input_team() is not None:
-                msg="DEFENSE: E + CLICK BRICKWALL, THEN SPACE / READY"
+                msg="DEFENSE: E + CLICK MARBLE, THEN SPACE / READY"
             else:
                 msg="WAITING FOR LOCKS..."
             self.label(msg,40,844,"body_b",GOLD if not self._input_is_attacker() else TEXT)
@@ -1090,10 +1190,17 @@ class Game:
         self.label(f"HITS: {self.hit_count}",1240,875,"small",MUTED,"topright")
         if self.status_life>0 and self.state!="over":
             toast=pygame.Rect(ARENA_RECT.centerx-220,ARENA_RECT.top+41,440,34)
-            self.rounded(toast,(248,253,255),10,(105,178,217))
-            self.label(self.status,toast.centerx,toast.centery,"small",TEXT,"center")
+            self.rounded(toast,PANEL,10,(105,178,217))
+            self.fit_label(self.status,toast,"small",TEXT)
         if getattr(self,'eyes_notice',{}).get(self.turn) and (self.cpu_mode=='off' or self.turn==0):
             self.label('EYES: '+self.eyes_notice[self.turn],640,106,'body_b',(130,65,177),'center')
+        if getattr(self,'eyes_flash',0)>0 and (self.cpu_mode=='off' or self.turn==0):
+            image=self.menu.assets.image('vfx/eyes_of_heaven.png')
+            if image:
+                key=('eyes_banner',)
+                if key not in self.menu.assets.scaled:self.menu.assets.scaled[key]=pygame.transform.smoothscale(image,(540,180))
+                self.screen.blit(self.menu.assets.scaled[key],(370,170))
+        if self.state=='curse':self.label('CURSE UNLEASHED!',640,80,'heading',(255,90,255),'center')
         if self.state=="over":
             self.draw_victory()
 
@@ -1102,7 +1209,7 @@ class Game:
         fog.fill((6,11,19,189))
         self.screen.blit(fog,(0,0))
         rect=pygame.Rect(386,295,508,281)
-        self.rounded(rect,(239,250,255),22,(91,124,154),2)
+        self.rounded(rect,PANEL,22,(91,124,154),2)
         color=BLUE if self.winner==0 else RED if self.winner==1 else GOLD
         message="BLUE WINS!" if self.winner==0 else "RED WINS!" if self.winner==1 else "DRAW!"
         self.label("FINAL RESULT",640,328,"small",MUTED,"midtop")
@@ -1129,6 +1236,7 @@ class Game:
             else:
                 self.draw_hud()
             pygame.display.flip()
+        self.fx.restore_window()
         pygame.quit()
 
 

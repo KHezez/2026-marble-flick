@@ -1,0 +1,4 @@
+*.bat text eol=crlf whitespace=cr-at-eol
+
+# Preserve upstream font license verbatim.
+assets/fonts/OFL.txt -whitespace

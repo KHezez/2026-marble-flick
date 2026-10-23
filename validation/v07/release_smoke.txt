@@ -1,0 +1,5 @@
+2026-10-23, Linux SDL dummy, Python 3.12.14 / pygame 2.6.1
+Extracted release ZIP in a separate folder; isolated save in /tmp.
+All 5 menu pages, 4 inventory tabs, 6 maps rendered.
+Curse cast -> random launch -> moving phase -> Game.run quit: OK.
+ZIP CRC test: OK. Personal saves and virtual environments excluded.

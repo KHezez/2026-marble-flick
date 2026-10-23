@@ -1,0 +1,80 @@
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/defeat.mp3: fallback: defeat.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/countdown.mp3: fallback: countdown.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/bull_charge.mp3: fallback: bull_charge.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/bull_ready.mp3: fallback: bull_ready.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/bull_freeze.mp3: fallback: bull_freeze.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/bull_counter.mp3: fallback: bull_counter.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/bull_impact.mp3: fallback: bull_impact.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ankle_ready.mp3: fallback: ankle_ready.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/ankle_dodge.mp3: fallback: ankle_dodge.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/infinity_ready.mp3: fallback: infinity_ready.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/infinity_stop.mp3: fallback: infinity_stop.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/curse_charge.mp3: fallback: curse_charge.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/curse_release.mp3: fallback: curse_release.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/curse_launch.mp3: fallback: curse_launch.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/eyes_activate.mp3: fallback: eyes_activate.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/skin_draw.mp3: fallback: skin_draw.mp3
+WARNING:marble.audio:/workspace/2026-marble-flick/assets/sfx/walls_open.mp3: fallback: walls_open.mp3
+INFO:marble.audio:Mixer=(44100, -16, 2); channels=32, reserved=8; SFX volume=0.7
+WARNING:marble.audio:SFX channels exhausted: countdown; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: bull_charge; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: bull_ready; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: bull_freeze; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: bull_counter; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: ankle_breaker_ready; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: ankle_dodge; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: infinity_ready; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: infinity_stop; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: curse_launch; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: skin_draw; replacing oldest nonreserved channel
+WARNING:marble.audio:SFX channels exhausted: walls_open; replacing oldest nonreserved channel
+pygame 2.6.1 (SDL 2.28.4, Python 3.12.14)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+ui_click.mp3: decoded 0.198s; channel_active=True; volume=0.7
+ui_hover.mp3: decoded 0.129s; channel_active=True; volume=0.7
+menu_enter.mp3: decoded 0.763s; channel_active=True; volume=0.7
+menu_transition.mp3: decoded 0.299s; channel_active=True; volume=0.7
+shop_open.mp3: decoded 1.019s; channel_active=True; volume=0.7
+gacha_start.mp3: decoded 2.614s; channel_active=True; volume=0.7
+gacha_result.mp3: decoded 1.187s; channel_active=True; volume=0.7
+gacha_rare.mp3: decoded 4.049s; channel_active=True; volume=0.7
+inventory_equip.mp3: decoded 0.516s; channel_active=True; volume=0.7
+passive_activate.mp3: decoded 1.103s; channel_active=True; volume=0.7
+clutch_activate.mp3: decoded 5.294s; channel_active=True; volume=0.7
+match_start.mp3: decoded 1.933s; channel_active=True; volume=0.7
+victory.mp3: decoded 6.348s; channel_active=True; volume=0.7
+defeat.mp3: fallback: defeat.mp3; channel_active=True; volume=0.7
+marble_hit.mp3: decoded 0.375s; channel_active=True; volume=0.7
+marble_flick.mp3: decoded 0.663s; channel_active=True; volume=0.7
+marble_fall.mp3: decoded 0.216s; channel_active=True; volume=0.7
+wood_break.mp3: decoded 2.017s; channel_active=True; volume=0.7
+injury.mp3: decoded 0.795s; channel_active=True; volume=0.7
+brickwall_activate.mp3: decoded 1.660s; channel_active=True; volume=0.7
+brickwall_hit.mp3: decoded 2.141s; channel_active=True; volume=0.7
+tiger_shot.mp3: decoded 2.397s; channel_active=True; volume=0.7
+tiger_wind.mp3: decoded 2.184s; channel_active=True; volume=0.7
+chain_start.mp3: decoded 1.039s; channel_active=True; volume=0.7
+chain_hit.mp3: decoded 1.004s; channel_active=True; volume=0.7
+chain_dash.mp3: decoded 0.427s; channel_active=True; volume=0.7
+cola_charge.mp3: decoded 2.509s; channel_active=True; volume=0.7
+cola_explosion.mp3: decoded 0.682s; channel_active=True; volume=0.7
+turn_lock.mp3: decoded 1.776s; channel_active=True; volume=0.7
+reveal.mp3: decoded 0.863s; channel_active=True; volume=0.7
+countdown.mp3: fallback: countdown.mp3; channel_active=True; volume=0.7
+bull_charge.mp3: fallback: bull_charge.mp3; channel_active=True; volume=0.7
+bull_ready.mp3: fallback: bull_ready.mp3; channel_active=True; volume=0.7
+bull_freeze.mp3: fallback: bull_freeze.mp3; channel_active=True; volume=0.7
+bull_counter.mp3: fallback: bull_counter.mp3; channel_active=True; volume=0.7
+bull_impact.mp3: fallback: bull_impact.mp3; channel_active=True; volume=0.7
+ankle_ready.mp3: fallback: ankle_ready.mp3; channel_active=True; volume=0.7
+ankle_dodge.mp3: fallback: ankle_dodge.mp3; channel_active=True; volume=0.7
+infinity_ready.mp3: fallback: infinity_ready.mp3; channel_active=True; volume=0.7
+infinity_stop.mp3: fallback: infinity_stop.mp3; channel_active=True; volume=0.7
+curse_charge.mp3: fallback: curse_charge.mp3; channel_active=True; volume=0.7
+curse_release.mp3: fallback: curse_release.mp3; channel_active=True; volume=0.7
+curse_launch.mp3: fallback: curse_launch.mp3; channel_active=True; volume=0.7
+eyes_activate.mp3: fallback: eyes_activate.mp3; channel_active=True; volume=0.7
+skin_draw.mp3: fallback: skin_draw.mp3; channel_active=True; volume=0.7
+walls_open.mp3: fallback: walls_open.mp3; channel_active=True; volume=0.7
+Mixer: (44100, -16, 2) driver: dummy
+Headless verifies decoding and scheduling, NOT speaker output.

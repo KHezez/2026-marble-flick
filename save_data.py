@@ -7,11 +7,12 @@ import logging
 from stats import TeamStats, STAT_CAPS
 from perks import PERKS, validate
 from abilities import SKILLS
+from skins import SKINS
 
 def default_profile():
-    load={'skills':['brickwall','tiger'],'perks':[], 'stats':{k:0 for k in STAT_CAPS}}
-    return {'version':1,'coins':500,'owned_skills':['brickwall','tiger'],'owned_perks':['heavy','sniper','metal'],
-            'active_loadout':'default','loadouts':{'default':load},'history':[],
+    load={'skills':['brickwall','tiger'],'perks':[], 'stats':{k:0 for k in STAT_CAPS}, 'skin':'classic'}
+    return {'version':2,'coins':500,'owned_skills':['brickwall','tiger'],'owned_perks':['heavy','sniper','metal'],
+            'owned_skins':['classic'], 'settings':{'language':'ko','screen_shake':True,'hit_stop':True,'flash':True,'window_shake':False}, 'active_loadout':'default','loadouts':{'default':load},'history':[],
             'audio':{'sfx':.7,'music':.45,'muted':False}}
 
 class SaveStore:
@@ -34,8 +35,13 @@ class SaveStore:
         if not isinstance(raw,dict):raise ValueError('Invalid profile')
         data=default_profile()
         data['coins']=max(0,int(raw.get('coins',500)))
-        for field,valid in [('owned_skills',SKILLS),('owned_perks',PERKS)]:
+        for field,valid in [('owned_skills',SKILLS),('owned_perks',PERKS),('owned_skins',SKINS)]:
             data[field]=list(dict.fromkeys(x for x in raw.get(field,data[field]) if x in valid))
+        if 'classic' not in data['owned_skins']:data['owned_skins'].append('classic')
+        settings=raw.get('settings',{})
+        if not isinstance(settings,dict):settings={}
+        for key,default in data['settings'].items():
+            data['settings'][key]=(settings.get(key,'ko') if settings.get(key,'ko') in ('ko','en') else 'ko') if key=='language' else bool(settings.get(key,default))
         # Keep starter skills available even after a damaged/old save.
         for skill in ('brickwall','tiger'):
             if skill not in data['owned_skills']:data['owned_skills'].append(skill)
@@ -49,7 +55,7 @@ class SaveStore:
                 try:validate(perks+[p])
                 except ValueError:continue
                 perks.append(p)
-            data['loadouts'][str(name)]={'skills':skills,'perks':perks,'stats':vars(stats)}
+            data['loadouts'][str(name)]={'skills':skills,'perks':perks,'stats':vars(stats),'skin':load.get('skin','classic') if load.get('skin','classic') in data['owned_skins'] else 'classic'}
         active=raw.get('active_loadout','default')
         data['active_loadout']=active if active in data['loadouts'] else 'default'
         data['history']=raw.get('history',[])[-100:]
