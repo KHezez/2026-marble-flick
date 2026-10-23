@@ -9,7 +9,7 @@ from save_data import SaveStore
 class PackagingPaths(unittest.TestCase):
     def test_frozen_save_beside_exe_not_temporary_bundle(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ,{},clear=True), patch.object(runtime_paths.sys,'frozen',True,create=True), patch.object(runtime_paths.sys,'executable',str(Path(directory)/'MarbleFlick.exe')):
-            self.assertEqual(SaveStore().path,Path(directory)/'user_data'/'profile.json')
+            self.assertEqual(SaveStore().path.resolve(),(Path(directory)/'user_data'/'profile.json').resolve())
     def test_override_remains_available(self):
         with patch.dict(os.environ,{'MARBLE_SAVE_PATH':'custom-profile.json'}):
             self.assertEqual(SaveStore().path,Path('custom-profile.json'))
