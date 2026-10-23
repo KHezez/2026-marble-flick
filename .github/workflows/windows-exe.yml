@@ -11,6 +11,8 @@ on:
       - 'assets/**'
       - 'tests/**'
       - '.github/workflows/windows-exe.yml'
+env:
+  PYTHONUTF8: '1'
 permissions:
   contents: read
 concurrency:
@@ -37,11 +39,19 @@ jobs:
           MARBLE_SAVE_PATH: ${{ runner.temp }}\marble-source-test.json
         run: |
           python -m unittest discover -s tests 2>&1 | Tee-Object -FilePath source-tests.log
-          if ($LASTEXITCODE -ne 0) { throw 'Source tests failed' }
+          if ($LASTEXITCODE -ne 0) {
+            $details = (Get-Content source-tests.log -Tail 80) -join '%0A'
+            Write-Output "::error title=Source test failures::$details"
+            throw 'Source tests failed'
+          }
       - name: Build one-file GUI EXE
         run: |
           python -m PyInstaller --clean --noconfirm MarbleFlick.spec 2>&1 | Tee-Object -FilePath build-exe.log
-          if ($LASTEXITCODE -ne 0) { throw 'PyInstaller build failed' }
+          if ($LASTEXITCODE -ne 0) {
+            $details = (Get-Content build-exe.log -Tail 60) -join '%0A'
+            Write-Output "::error title=EXE build failure::$details"
+            throw 'PyInstaller build failed'
+          }
       - name: Test the actual EXE including two-process LAN
         shell: pwsh
         run: |
@@ -49,7 +59,11 @@ jobs:
           $process = Start-Process -FilePath '.\dist\MarbleFlick.exe' -ArgumentList @('--self-test', $report) -PassThru
           if (-not $process.WaitForExit(180000)) { $process.Kill(); throw 'EXE self-test timed out' }
           if (Test-Path $report) { Get-Content $report; Copy-Item $report dist/windows-exe-test.json }
-          if ($process.ExitCode -ne 0) { throw "EXE self-test failed: $($process.ExitCode)" }
+          if ($process.ExitCode -ne 0) {
+            $details = (Get-Content $report) -join '%0A'
+            Write-Output "::error title=EXE smoke failure::$details"
+            throw "EXE self-test failed: $($process.ExitCode)"
+          }
           $check = Get-Content $report -Raw | ConvertFrom-Json
           if (-not $check.ok -or $check.two_exe_lan -ne 'passed') { throw 'EXE verification incomplete' }
           $hash = (Get-FileHash dist/MarbleFlick.exe -Algorithm SHA256).Hash.ToLower()
