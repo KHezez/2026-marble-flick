@@ -20,8 +20,6 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build:
-    permissions:
-      contents: write
     runs-on: windows-latest
     timeout-minutes: 25
     steps:
@@ -46,7 +44,7 @@ jobs:
           pathlib.Path('source-tests.log').write_text(r.stdout, encoding='utf-8')
           print(r.stdout)
           if r.returncode:
-              message = r.stdout[-12000:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              message = r.stdout[-3000:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
               print('::error title=Source test failures::' + message)
           sys.exit(r.returncode)
       - name: Build one-file GUI EXE
@@ -57,7 +55,7 @@ jobs:
           pathlib.Path('build-exe.log').write_text(r.stdout, encoding='utf-8')
           print(r.stdout)
           if r.returncode:
-              message = r.stdout[-12000:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              message = r.stdout[-3000:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
               print('::error title=EXE build failure::' + message)
           sys.exit(r.returncode)
       - name: Test the actual EXE including two-process LAN
@@ -89,23 +87,6 @@ jobs:
               '```' >> $env:GITHUB_STEP_SUMMARY
             }
           }
-      - name: Preserve failed Windows diagnostics
-        if: failure()
-        shell: bash
-        run: |
-          mkdir -p validation/v081
-          for file in source-tests.log build-exe.log; do
-            if [ -f "$file" ]; then cp "$file" "validation/v081/windows-${file%.log}.txt"; fi
-          done
-          if [ -f dist/windows-exe-test.json ]; then cp dist/windows-exe-test.json validation/v081/windows-exe-test.json; fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add validation/v081/
-          if ! git diff --cached --quiet; then
-            git commit -m 'Record Windows build diagnostics [skip ci]'
-            git pull --rebase origin main
-            git push origin HEAD:main
-          fi
       - uses: actions/upload-artifact@v4
         with:
           name: MarbleFlick-Windows-x64
