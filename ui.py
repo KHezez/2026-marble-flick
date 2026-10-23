@@ -19,7 +19,7 @@ class MenuUI:
     def __init__(self,game):
         self.g=game;self.page='home';self.widgets=[];self.hover=None;self.selected=None
         self.draw_time=0.;self.result=None;self.notice='';self.themes={}
-        self.inventory_team=0;self.tab='skill';self.slot=0;self.assets=Assets()
+        self.inventory_team=0;self.tab='skill';self.slot=0;self.assets=Assets();self.skin_page=0;self.ip_focus=False
     @property
     def lang(self):return self.g.profile['settings']['language']
     def say(self,ko,en):return ko if self.lang=='ko' else en
@@ -44,6 +44,8 @@ class MenuUI:
         g.label(text,*shown.center,'body_b',WHITE,'center')
         if not disabled:self.widgets.append((rect,action,value))
     def go(self,page):
+        if getattr(self.g,'net',None) and self.g.net.active and page!='lan':
+            self.notice=self.say('먼저 LAN 연결을 종료하세요.','Disconnect from LAN first.');return
         self.page=page;self.notice='';self.selected=None
         self.g.sound.play('shop' if page=='shop' else 'menu' if page=='home' else 'transition')
         self.g.sound.music({'home':'main_menu','setup':'main_menu','shop':'shop','inventory':'inventory','settings':'settings'}.get(page,'main_menu'))
@@ -61,7 +63,16 @@ class MenuUI:
                 if action=='count' and value==1:
                     for load in (active(g.profile),g.red_loadout):validate(load['perks'],1)
                 setattr(g,action,value)
-            elif action=='start':g.start_match()
+            elif action=='start':g.boss_kind=None;g.start_match()
+            elif action=='boss_start':g.boss_kind=value;g.count=max(4,g.count);g.start_match()
+            elif action=='skin_page':self.skin_page=value
+            elif action=='net_mode':g.net.mode=value
+            elif action=='net_boss':g.net.boss=value
+            elif action=='net_host':g.net.host()
+            elif action=='net_join':g.net.join()
+            elif action=='net_stop':g.net.stop()
+            elif action=='net_ready':g.net.set_ready()
+            elif action=='net_ip':self.ip_focus=not self.ip_focus
             elif action=='item':self.selected=value
             elif action=='tab':self.tab=value;self.slot=0;self.selected=None
             elif action=='slot':self.tab,self.slot=value;self.selected=None
@@ -86,8 +97,13 @@ class MenuUI:
                 if value=='window_shake' and not g.profile['settings'][value]:g.fx.restore_window()
             elif action=='resume':
                 g.state=g._settings_return_state;g._settings_return_state=None;g.sync_music()
-        except ValueError as exc:self.notice=str(exc)
+        except (ValueError,OSError) as exc:self.notice=str(exc)
     def event(self,event):
+        if self.page=='lan' and self.ip_focus and event.type==pygame.KEYDOWN:
+            if event.key==pygame.K_BACKSPACE:self.g.net.ip=self.g.net.ip[:-1]
+            elif event.key in (pygame.K_RETURN,pygame.K_ESCAPE):self.ip_focus=False
+            elif event.unicode and all(c in '0123456789.:' for c in event.unicode) and len(self.g.net.ip)<26:self.g.net.ip+=event.unicode
+            return True
         if event.type==pygame.KEYDOWN and event.key==pygame.K_F10:self.go('settings');return True
         if event.type==pygame.KEYDOWN and event.key==pygame.K_m:self.perform('mute',None);return True
         if event.type==pygame.KEYDOWN and event.key==pygame.K_ESCAPE:
@@ -107,14 +123,14 @@ class MenuUI:
         self.hover=hit
     def render(self):
         g=self.g;self.widgets=[];self.background({'shop':'shop','inventory':'inventory'}.get(self.page,'main_menu'))
-        g.label('MARBLE FLICK',35,22,'title',WHITE);g.label('v0.7',360,35,'body',GOLD)
+        g.label('MARBLE FLICK',35,22,'title',WHITE);g.label('v0.8',360,35,'body',GOLD)
         self.button((990,20,250,58),f"{g.profile['coins']:,} Coins",'noop',selected=True)
         if self.page!='home':
             self.button((35,105,140,50),'BACK','resume' if getattr(g,'_settings_return_state',None) else 'page',None if getattr(g,'_settings_return_state',None) else 'home')
-        {'home':self.home,'setup':self.setup,'shop':self.shop,'inventory':self.inventory,'settings':self.settings}[self.page]()
+        {'home':self.home,'setup':self.setup,'shop':self.shop,'inventory':self.inventory,'settings':self.settings,'boss':self.boss_page,'lan':self.lan_page}[self.page]()
         if self.notice:
             self.box((35,820,1210,42));g.label(self.notice,50,827,'body',GOLD)
-        g.label('P: +1000 Coins',35,870,'small',GOLD)
+        g.label('LAN: P OFF' if g.net.active else 'P: +1000 Coins',35,870,'small',GOLD)
         g.label(self.say('F10 설정 · M 음소거','F10 Settings · M Mute'),1235,870,'small',INK,'topright')
     def home(self):
         g=self.g;g.label(self.say('한 방에 뒤집어라!','MAKE YOUR MOVE!'),640,170,'hero',WHITE,'center')
@@ -122,7 +138,8 @@ class MenuUI:
             rect=pygame.Rect(130+i*390,260,240,240);self.assets.icon(g.screen,key,'skill',rect);self.assets.frame(g.screen,key,rect,g.frame)
         for i,(text,page) in enumerate((('START','setup'),('SHOP','shop'),('INVENTORY','inventory'),('SETTINGS','settings'))):
             self.button((150+i*250,600,230,86),text,'page',page,color=i%4)
-        g.label(self.say('스킬 8종 · 패시브 12종 · 다양한 전장','8 skills · 12 passives · New battlegrounds'),640,750,'heading',INK,'center')
+        self.button((350,715,270,70),self.say('보스 도전','BOSS CHALLENGE'),'page','boss',color=2)
+        self.button((660,715,270,70),self.say('LAN 함께하기','LAN PLAY'),'page','lan',color=1)
     def setup(self):
         g=self.g;g.label(self.say('경기 설정','MATCH SETUP'),640,120,'title',WHITE,'center')
         groups=[('TEAM SIZE','count',(1,4,5,6,7,8,9,10)),('OPPONENT','cpu_mode',('off','easy','normal','hard'))]
@@ -177,6 +194,12 @@ class MenuUI:
         else:
             keys=list(SKILLS if self.tab=='skill' else PERKS if self.tab=='passive' else SKINS)
             owned=p[{'skill':'owned_skills','passive':'owned_perks','skin':'owned_skins'}[self.tab]]
+            if self.tab=='skin':
+                pages=(len(keys)+11)//12;self.skin_page=min(self.skin_page,pages-1)
+                self.button((55,655,115,35),'◀','skin_page',max(0,self.skin_page-1),disabled=self.skin_page==0)
+                self.button((690,655,115,35),'▶','skin_page',min(pages-1,self.skin_page+1),disabled=self.skin_page==pages-1)
+                g.label(f'{self.skin_page+1} / {pages}',430,670,'small',INK,'center')
+                keys=keys[self.skin_page*12:(self.skin_page+1)*12]
             for i,key in enumerate(keys):
                 x=50+i%4*192;y=200+i//4*153;rect=pygame.Rect(x,y,178,140)
                 pygame.draw.rect(g.screen,(36,47,85),rect,border_radius=12)
@@ -217,9 +240,48 @@ class MenuUI:
             title=item_name(key,kind,self.lang)+'  ·  '+tr(rarity,self.lang)
             if kind=='skill':title+=self.say(f' · 재사용 {COOLDOWNS[key]}턴',f' · CD {COOLDOWNS[key]} turns') if key!='curse' else self.say(' · 경기당 1회',' · ONCE PER MATCH')
             g.label(title,55,710,'body_b',RARITY[rarity])
-            g.wrap_label(description(key,kind,self.lang),pygame.Rect(55,748,920,60),'small',INK)
+            g.wrap_label(self.say('노곡빈 보스의 2페이즈까지 클리어하면 획득. 뽑기에서는 나오지 않습니다.','Clear both Gokbin phases to unlock. Not in gacha.') if kind=='skin' and key=='gokbin_curse' else description(key,kind,self.lang),pygame.Rect(55,748,920,60),'small',INK)
             self.button((1000,735,215,60),'EQUIP','equip',self.selected,color=1)
         else:g.label(self.say('오른쪽 슬롯 → 아이템 그림 → 장착 순서로 선택하세요.','Choose a slot, choose an item, then EQUIP.'),55,742,'heading',INK)
+    def boss_page(self):
+        from bosses import BOSSES
+        g=self.g;g.label(self.say('보스 도전 · 솔로','BOSS CHALLENGE · SOLO'),640,130,'title',WHITE,'center')
+        descriptions={
+          'warden':self.say('조준 돌진과 근접 충격파. 공격 예고를 보고 방어 스킬을 준비하세요.','Aimed charges and close shockwaves. Prepare defenses after the telegraph.'),
+          'tempest':self.say('십자 돌풍과 흡인. 흩어져서 범위 공격을 피하세요.','Crosswinds and a pulling vortex. Spread out to avoid area attacks.'),
+          'gokbin':self.say('2페이즈 보스. 붉게 변하면 폭주 저주! 끝까지 클리어하면 전용 스킨 획득.','Two phases. Red phase unleashes stronger curses. Clear both for an exclusive skin.')}
+        for i,(key,data) in enumerate(BOSSES.items()):
+            x=40+i*410;self.box((x,210,380,475))
+            self.assets.icon(g.screen,{'warden':'gold','tempest':'ocean','gokbin':'gokbin'}[key],'skin',(x+110,235,160,160))
+            g.label(data[0 if self.lang=='ko' else 1],x+190,430,'title',WHITE,'center')
+            g.wrap_label(descriptions[key],pygame.Rect(x+25,475,330,100),'body',INK,center=True)
+            self.button((x+30,605,320,60),self.say('도전 시작','CHALLENGE'),'boss_start',key,color=i)
+        g.label(self.say('경기 설정의 아군 수(최소 4개)와 내 로드아웃 사용 · LAN에서 협동 가능','Uses your loadout and team size (4 minimum) · Coop available in LAN'),640,740,'body',INK,'center')
+        self.button((480,775,320,48),self.say('스탯 / 장착 변경','EDIT LOADOUT'),'page','inventory')
+
+    def lan_page(self):
+        from net_transport import local_addresses
+        from bosses import BOSSES
+        g=self.g;n=g.net;locked=n.active
+        g.label(self.say('같은 네트워크에서 함께','PLAY ON THE SAME LAN'),640,130,'title',WHITE,'center')
+        self.box((80,195,1120,610))
+        for i,(key,ko,en) in enumerate((('pvp','1대1 대전','VERSUS'),('coop','협동 vs CPU','COOP vs CPU'),('boss','협동 보스','COOP BOSS'))):
+            self.button((110+i*355,220,330,60),self.say(ko,en),'net_mode',key,n.mode==key,disabled=locked,color=i)
+        for i,key in enumerate(BOSSES):
+            self.button((110+i*355,300,330,50),BOSSES[key][0 if self.lang=='ko' else 1],'net_boss',key,n.boss==key,disabled=locked or n.mode!='boss')
+        config=n.peer_config if locked and not n.is_host and n.peer_config else n.config()
+        g.label(self.say(f"방장 설정: {config['count']}개 · {config['map_key']} · CPU {config['cpu_mode']}",f"HOST: {config['count']} marbles · {config['map_key']} · CPU {config['cpu_mode']}"),110,380,'body_b',INK)
+        self.button((110,425,320,52),self.say('경기 설정 변경','MATCH OPTIONS'),'page','setup',disabled=locked)
+        self.button((450,425,300,52),self.say('장착 변경','LOADOUT'),'page','inventory',disabled=locked)
+        g.label(self.say('방장 주소: ','HOST IP: ')+', '.join(local_addresses())+':24872',110,500,'body_b',GOLD)
+        self.button((110,550,550,60),n.ip+(' |' if self.ip_focus else ''),'net_ip',disabled=locked)
+        self.button((680,550,220,60),self.say('방 만들기','HOST'),'net_host',disabled=locked)
+        self.button((920,550,220,60),self.say('접속','JOIN'),'net_join',disabled=locked)
+        g.wrap_label(n.notice,pygame.Rect(110,630,1000,55),'body',INK)
+        self.button((110,710,460,60),self.say('준비 완료 ✓' if n.ready else '준비', 'READY ✓' if n.ready else 'READY'),'net_ready',selected=n.ready,disabled=not n.connected)
+        self.button((600,710,250,60),self.say('연결 종료','DISCONNECT'),'net_stop',disabled=not locked,color=2)
+        g.label(self.say('친구 준비 ✓' if n.peer_ready else '친구 대기 중','Friend READY' if n.peer_ready else 'Friend waiting'),890,730,'body',GOLD)
+
     def settings(self):
         g=self.g;self.button((900,105,270,50),'UNMUTE' if g.sound.muted else 'MUTE','mute',color=2); g.label('OPTIONS',640,125,'title',WHITE,'center');self.box((160,200,960,610))
         g.label('LANGUAGE',195,235,'heading',INK)
@@ -238,7 +300,11 @@ def battle_panel(g):
     for team in (0,1):
         x=25 if team==0 else 950
         pygame.draw.rect(g.screen,PANEL,(x,150,305,665),border_radius=18)
-        g.label('BLUE' if team==0 else 'RED',x+20,170,'title',WHITE)
+        title='BLUE' if team==0 else 'RED'
+        if team==1 and g.arena.boss_state:
+            from bosses import BOSSES
+            title=BOSSES[g.arena.boss_state['kind']][0 if lang=='ko' else 1]
+        g.label(title,x+20,170,'title',WHITE)
         g.label(f"{len(g.arena.living(team))}"+('개 생존' if lang=='ko' else ' MARBLES'),x+20,220,'heading',INK)
         for i,key in enumerate(g.arena.team_perks[team]):
             a.icon(g.screen,key,'passive',(x+16,280+i*80,65,65))

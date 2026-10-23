@@ -9,6 +9,8 @@ BURSTS={'hit':0,'brickwall_hit':0,'tiger_wind':1,'bull_impact':2,'bull_counter':
         'ankle_dodge':3,'curse_launch':4,'infinity_ready':5,'infinity_stop':5,
         'cola_explosion':6,'clutch':7,'last_resort':7,'wood_break':0,'chain_hit':1,'brickwall_on':0}
 
+BURSTS.update(boss_hit=2,boss_attack=6,boss_phase=4,boss_defeat=7)
+
 class ImpactFX:
     def __init__(self):
         self.rings=[];self.shake=0.;self.freeze=0.;self.zoom=0.;self.flash=0.

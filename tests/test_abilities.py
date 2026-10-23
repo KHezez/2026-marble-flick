@@ -64,7 +64,7 @@ class SkillModelTests(unittest.TestCase):
         a=sandbox()
         a.obstacles=[Obstacle(0,370,480,40,40,'wood',hp=1.6)]
         self.assertTrue(a.shoot(0,100,0,ability='tiger'))
-        self.assertAlmostEqual(a.eggs[0].vx,100*8.33*3)
+        self.assertAlmostEqual(a.eggs[0].vx,100*8.33*2)
         for _ in range(110):a.step(1/480)
         self.assertFalse(a.obstacles[0].alive)
 

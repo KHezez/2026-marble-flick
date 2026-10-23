@@ -129,7 +129,7 @@ class CombatRules:
                 owner.x,owner.y=c.contact
                 dx,dy=target.x-owner.x,target.y-owner.y;dist=max(.001,hypot(dx,dy))
                 from stats import power_transfer_multiplier
-                strength=1500*.5*power_transfer_multiplier(self.team_stats[owner.team],owner.injury_turns>0)*self.mult(owner.team,'power')
+                strength=1500*.5*power_transfer_multiplier(self.stats_for(owner),owner.injury_turns>0)*self.mult_for(owner,'power')
                 resistance=max(.1,self._effective_mass(target))
                 target.vx=dx/dist*strength/resistance;target.vy=dy/dist*strength/resistance
                 self.injure(target.id,3);self.emit('bull_impact',target,1.4)
@@ -145,7 +145,7 @@ class CombatRules:
         for e in self.living(1-team):
             if e.brickwall or self.invulnerable(e):continue
             angle=self.rng.uniform(0,tau)
-            speed=MAX_PULL*BASE_POWER_SCALE*shot_speed_multiplier(self.team_stats[e.team],e.injury_turns>0)*self.mult(e.team,'speed')
+            speed=MAX_PULL*BASE_POWER_SCALE*shot_speed_multiplier(self.stats_for(e),e.injury_turns>0)*self.mult_for(e,'speed')
             e.vx=cos(angle)*speed;e.vy=sin(angle)*speed
             self.emit('curse_launch',e)
         self.active_shooter_id=None;self.attacking_team=1-team

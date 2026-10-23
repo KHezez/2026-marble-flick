@@ -11,7 +11,7 @@ from skins import SKINS
 
 def default_profile():
     load={'skills':['brickwall','tiger'],'perks':[], 'stats':{k:0 for k in STAT_CAPS}, 'skin':'classic'}
-    return {'version':2,'coins':500,'owned_skills':['brickwall','tiger'],'owned_perks':['heavy','sniper','metal'],
+    return {'version':3,'boss_clears':{},'coins':500,'owned_skills':['brickwall','tiger'],'owned_perks':['heavy','sniper','metal'],
             'owned_skins':['classic'], 'settings':{'language':'ko','screen_shake':True,'hit_stop':True,'flash':True,'window_shake':False}, 'active_loadout':'default','loadouts':{'default':load},'history':[],
             'audio':{'sfx':.7,'music':.45,'muted':False}}
 
@@ -38,6 +38,8 @@ class SaveStore:
         for field,valid in [('owned_skills',SKILLS),('owned_perks',PERKS),('owned_skins',SKINS)]:
             data[field]=list(dict.fromkeys(x for x in raw.get(field,data[field]) if x in valid))
         if 'classic' not in data['owned_skins']:data['owned_skins'].append('classic')
+        data['boss_clears']={k:min(2,max(0,int(v))) for k,v in raw.get('boss_clears',{}).items() if k in ('warden','tempest','gokbin')}
+        if data['boss_clears'].get('gokbin',0)<2 and 'gokbin_curse' in data['owned_skins']:data['owned_skins'].remove('gokbin_curse')
         settings=raw.get('settings',{})
         if not isinstance(settings,dict):settings={}
         for key,default in data['settings'].items():

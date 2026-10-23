@@ -1,4 +1,4 @@
-"""MARBLE FLICK v0.7 — passives, persistent loadouts, arcade menus.
+"""MARBLE FLICK v0.8 — photo skins, solo bosses and authoritative LAN play.
 
 Controls
 --------
@@ -9,7 +9,7 @@ R: rematch              ESC: configuration menu
 M: mute/unmute
 
 Version 0.6 preserves the v0.5 physics and turn loop with pre-match loadouts.
-P grants 1000 test Coins in this local test version.
+P grants 1000 test Coins offline; it is disabled while connected to LAN.
 """
 from __future__ import annotations
 
@@ -96,11 +96,14 @@ class Particle:
     size: float
 
 
+import bosses
+from network_game import NetworkSession
+
 class Game:
     def __init__(self):
         pygame.mixer.pre_init(44100, -16, 1, 256)
         pygame.init()
-        pygame.display.set_caption("Marble Flick v0.7")
+        pygame.display.set_caption("Marble Flick v0.8")
         self.screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
         self.clock = pygame.time.Clock()
         self.fonts = {
@@ -121,6 +124,7 @@ class Game:
         self.eyes_notice={}; self.rewarded=False; self.reward_amount=0
         self.fx=ImpactFX()
         self.menu=MenuUI(self)
+        self.boss_kind=None;self.net=NetworkSession(self)
         self.sound.sfx_volume=self.profile['audio']['sfx']
         self.sound.music_volume=self.profile['audio']['music']
         self.sound.muted=self.profile['audio']['muted']
@@ -202,7 +206,10 @@ class Game:
 
     def sync_music(self):
         if hasattr(self.sound,'music') and self.arena:
-            self.sound.music('curse' if self.state=='curse' else music_for(self.arena,getattr(self,'clutch_music',False)))
+            scene='curse' if self.state=='curse' else music_for(self.arena,getattr(self,'clutch_music',False))
+            if self.arena.boss_state:
+                b=self.arena.boss_state;scene='boss_gokbin_phase2' if b['kind']=='gokbin' and b['phase']==2 else bosses.BOSSES[b['kind']][4]
+            self.sound.music(scene)
 
     def rounded(self, rect, fill, radius=12, stroke=None, width=1, target=None):
         surface = self.screen if target is None else target
@@ -243,6 +250,9 @@ class Game:
                 self.arena.team_stats[team]=TeamStats(**load['stats'])
             self.arena.configure_perks({0:active(self.profile)['perks'],1:self.red_loadout['perks']},self.count)
             self.store.save(self.profile)
+        if getattr(self,'boss_kind',None):
+            apply_map(self.arena,bosses.BOSSES[self.boss_kind][3]);bosses.install(self.arena,self.boss_kind)
+            self.loadouts[1]=SkillLoadout([]);self.cpu_mode='normal'
         self.curve=0.;self.locked_curve=0.;self.eyes_ready={0:1,1:1};self.eyes_notice={}
         self.rewarded=False;self.reward_amount=0
         self.eyes_targets={};self.eyes_flash=0.;self.curse_timer=0.;self.clutch_music=False
@@ -284,7 +294,7 @@ class Game:
         self._lab_widgets.clear()
         mode_text = "LOCAL 2P" if self.cpu_mode == "off" else f"CPU {self.cpu_mode.upper()}"
         self.banner(f"BLUE STARTS  |  {mode_text}  |  50 POINTS / TEAM", 2.0)
-        self.sound.play("click")
+        self.sound.play("click");self.sync_music()
 
     def _make_board(self, floor):
         w, h = ARENA_RECT.size
@@ -340,6 +350,7 @@ class Game:
             self.banner(f"SURFACE CHANGED: {floor.upper()}")
 
     def _input_team(self):
+        if getattr(self,"net",None) and self.net.active and self.net.playing:return self.net.input_team()
         if self.state != "aim":
             return None
         if self.cpu_mode != "off":
@@ -350,6 +361,7 @@ class Game:
         return self._input_team() == self.turn and self.locked_attack is None
 
     def _set_prepared(self, team, egg):
+        if getattr(self,"net",None) and self.net.dispatch("prepare",egg=egg.id,slot=self.loadouts[team].selected):return
         skill = self.loadouts[team].equipped()
         if not skill:return
         if not self.loadouts[team].ready(skill, self.turn_number):
@@ -369,6 +381,7 @@ class Game:
         self.sound.play("click")
 
     def lock_shot(self, egg_id, mouse_release):
+        if getattr(self,"net",None) and self.net.dispatch("shot",egg=egg_id,pos=list(mouse_release),curve=self.curve):return
         if not self.arena or self.state != "aim" or self.locked_attack is not None:
             return
         egg = next((e for e in self.arena.living(self.turn) if e.id == egg_id), None)
@@ -401,9 +414,10 @@ class Game:
             if not hasattr(self,'eyes_targets'):self.eyes_targets={}
             self.eyes_targets[team]=skill.egg_id;self.eyes_flash=1.15
             self.sound.play('eyes_activate')
-            if self.cpu_mode=='off' or team==0:self.banner('EYES OF HEAVEN: '+SKILL_NAMES[skill.name],3)
+            if (not getattr(self,'net',None) or not self.net.playing or team==(self.net.player if self.net.mode=='pvp' else 0)) and (self.cpu_mode=='off' or team==0):self.banner('EYES OF HEAVEN: '+SKILL_NAMES[skill.name],3)
 
     def ready_defense(self):
+        if getattr(self,"net",None) and self.net.dispatch("ready"):return
         if self.state != "aim" or self.defense_ready:
             return
         if self.cpu_mode != "off" and self.turn == 0:
@@ -469,6 +483,8 @@ class Game:
             self.winner = 1 if a == 0 and b else (0 if b == 0 and a else -1)
             if hasattr(self,'profile') and not self.rewarded:
                 self.reward_amount=reward(self.profile,self.winner);self.rewarded=True
+                if self.winner==0 and bosses.grant(self.profile,self.arena.boss_state):
+                    self.sound.play('boss_reward');self.banner('노곡빈의 저주 스킨 획득! / Gokbin Curse unlocked!',5)
                 self.store.save(self.profile)
                 self.sound.play('victory' if self.winner==0 else 'defeat')
             return
@@ -486,6 +502,7 @@ class Game:
         self.chain_target = None
         self.cpu_planner = None
         self.cpu_delay = 0.0
+        if getattr(self,"net",None):self.net.next_turn()
         if passed:
             self.banner("TURN PASSED", 1.0)
 
@@ -516,6 +533,8 @@ class Game:
             if team==defender and active.name in ("bull","ankle_breaker","infinity"):
                 if not self.arena.activate_defense(selected.id,active.name):continue
             self.loadouts[team].commit(active.name, self.turn_number)
+        if self.arena.boss_state and self.turn==1:
+            self.state="boss_windup";self.reveal_timer=.9;self.sound.play("boss_warning");return
         egg_id, dx, dy = self.locked_attack
         selected = next((e for e in self.arena.living(attacker) if e.id == egg_id), None)
         if selected is None:
@@ -544,6 +563,7 @@ class Game:
             self.banner(f"{SKILL_NAMES.get(ability, 'PERFECT AIM')}!" if ability else "0 DEG AIM ERROR", 1.0)
 
     def _chain_redirect(self, auto=False):
+        if not auto and getattr(self,"net",None) and self.net.dispatch("chain",pos=list(self.mouse)):return
         if not self.arena or self.chain_target is None:
             return
         egg = next((e for e in self.arena.living() if e.id == self.chain_target), None)
@@ -566,12 +586,19 @@ class Game:
     def process_clutch(self):
         for ev in self.arena.events:
             if ev.kind=='clutch':
-                for skill in self.loadouts[ev.team].slots:self.loadouts[ev.team].ready_at[skill]=self.turn_number
+                books=list(self.net.books.values()) if getattr(self,'net',None) and self.net.playing and self.net.mode!='pvp' and ev.team==0 else [self.loadouts[ev.team]]
+                for book in books:
+                    for skill in book.slots:book.ready_at[skill]=self.turn_number
                 # Convert after processing so repeated checks never reset twice.
                 ev.kind='clutch_fx'
                 self.clutch_music=True;self.sync_music()
 
     def spawn_effect(self, ev: Event):
+        if getattr(self,"net",None) and self.net.playing and self.net.is_host:
+            from dataclasses import asdict
+            self.net.effects.append(asdict(ev));self.net.effects=self.net.effects[-50:]
+        if ev.kind.startswith("boss_"):
+            self.sound.play(ev.kind);self.sync_music()
         if hasattr(self,'fx'):
             visual=Event('clutch' if ev.kind=='clutch_fx' else ev.kind,ev.x,ev.y,ev.team,ev.strength)
             self.fx.emit(visual)
@@ -619,6 +646,12 @@ class Game:
                                            duration, duration, self.rng.uniform(2,5.3)))
 
     def update(self, dt):
+        net=getattr(self,'net',None)
+        if net:net.poll(dt)
+        self._update_local(dt)
+        if net:net.publish(dt)
+
+    def _update_local(self, dt):
         self.frame += 1
         if hasattr(self.sound,'update'):self.sound.update(dt)
         if hasattr(self,'menu'):self.menu.update(dt)
@@ -639,7 +672,12 @@ class Game:
             p.vy *= max(0, 1-dt*2.8)
         self.particles = [p for p in self.particles if p.life > 0]
 
-        if self.state == "aim":
+        if getattr(self,'net',None) and self.net.guest:return
+        if self.state == 'boss_windup':
+            self.reveal_timer-=dt
+            if self.reveal_timer<=0:
+                bosses.fire(self.arena);self.state='moving';self.travel_time=self.settle_time=self.accumulator=0.
+        elif self.state == "aim":
             previous_second=math.ceil(self.turn_left)
             self.turn_left = max(0, self.turn_left-dt)
             if 0<math.ceil(self.turn_left)<=5 and math.ceil(self.turn_left)!=previous_second:self.sound.play('countdown')
@@ -650,12 +688,13 @@ class Game:
                 if self.cpu_delay >= .60:
                     self._cpu_defense()
             if self.turn_left <= 0:
+                expired_turn=self.turn_number
                 if self.locked_attack is None:
                     if self.cpu_mode != "off" and self.turn == 1 and self.cpu_planner and self.cpu_planner.best:
                         self._cpu_prepare_attack(self.cpu_planner.best)
                     else:
                         self._finish_turn(passed=True)
-                if self.state == "aim":
+                if self.state == "aim" and self.turn_number==expired_turn:
                     self.defense_ready = True
             if self.state == "aim" and self.locked_attack is not None and self.defense_ready:
                 self._start_reveal()
@@ -679,7 +718,7 @@ class Game:
             else:
                 self.accumulator += dt*self.speed_factor
                 steps = 0
-                # Tiger moves 3x as fast; smaller substeps avoid tunneling.
+                # Tiger moves twice as fast; smaller substeps avoid tunneling.
                 simdt = FIXED_DT/2 if any(e.tiger for e in self.arena.living()) else FIXED_DT
                 while self.accumulator >= simdt and steps < 64:
                     self.arena.step(simdt)
@@ -716,6 +755,11 @@ class Game:
             self.arena.events.clear()
 
     def update_cpu(self, dt):
+        if self.arena.boss_state:
+            self.cpu_delay+=dt
+            if self.cpu_delay>=.6:
+                bosses.plan(self.arena);self.locked_attack=(100,0,150)
+            return
         self.cpu_delay += dt
         if self.cpu_delay < .38:
             return
@@ -797,6 +841,7 @@ class Game:
         self.sound.play("click")
 
     def handle_event(self, event):
+        if getattr(self,"net",None) and self.net.event(event):return True
         if event.type == pygame.QUIT:
             if hasattr(self,'menu'):self.menu.persist()
             return False
@@ -847,7 +892,7 @@ class Game:
             elif self.state == "aim" and self.arena:
                 input_team = self._input_team()
                 egg = self._pick_egg(pos, input_team) if input_team is not None else None
-                if egg is not None:
+                if egg is not None and not (getattr(self,"net",None) and self.net.playing and not self.net.owns(egg)):
                     if self.e_armed:
                         if input_team != self.turn and self.defense_ready:
                             self.banner("DEFENSE ALREADY READY", 1.0)
@@ -885,7 +930,7 @@ class Game:
             elif event.key == pygame.K_SPACE and self.state=="aim" and (self.locked_attack is not None or (self.cpu_mode!="off" and self.turn==1)):
                 self.ready_defense()
             elif event.key == pygame.K_TAB and self.state == "aim" and self._input_is_attacker():
-                self._finish_turn(passed=True)
+                if not (getattr(self,"net",None) and self.net.dispatch("pass")):self._finish_turn(passed=True)
             elif event.key == pygame.K_d: self.debug=not self.debug
             elif event.key == pygame.K_f:
                 self.speed_factor = 2 if self.speed_factor == 1 else 1
@@ -917,7 +962,7 @@ class Game:
     def draw_menu(self):
         self.menu.render()
 
-    def draw_egg_disc(self, x, y, r, team, number=None, selected=False, hovered=False, injured=False, inspected=False, brick=False, skill=None):
+    def draw_egg_disc(self, x, y, r, team, number=None, selected=False, hovered=False, injured=False, inspected=False, brick=False, skill=None, skin=None):
         x, y, r = round(x), round(y), int(r)
         color = (130, 136, 149) if brick else ((119, 37, 52) if injured else (BLUE if team == 0 else RED))
         if inspected:
@@ -936,13 +981,13 @@ class Game:
         pygame.draw.circle(self.screen, blend(color,WHITE,.06), (x,y+3), max(4,r//2))
         if not brick and hasattr(self,'profile'):
             load=active(self.profile) if team==0 else self.red_loadout
-            paint_skin(self.screen,pygame.Rect(x-r,y-r,2*r,2*r),load.get('skin','classic'),team)
+            paint_skin(self.screen,pygame.Rect(x-r,y-r,2*r,2*r),skin or load.get('skin','classic'),team)
         if injured:
             pygame.draw.line(self.screen, (232,69,84), (x-r//3,y-r//2),(x+3,y+r//4),2)
         if brick:
             pygame.draw.line(self.screen,(66,75,84),(x-r//2,y-r//3),(x+5,y+4),2)
             pygame.draw.line(self.screen,(66,75,84),(x+5,y+4),(x+12,y-4),2)
-        if number is not None:
+        if number is not None and not (not brick and hasattr(self,'profile') and (skin or load.get('skin','classic')) in ('cheeky','verity','gubby','man_face','gokbin','gokbin_curse')):
             self.label(number, x, y+1, "micro", (244, 220, 222) if injured else (11, 22, 33), "center")
 
     def draw_board(self):
@@ -1020,20 +1065,22 @@ class Game:
                     hover = near[1]
         for e in self.arena.living():
             tremble=math.sin(self.frame*2.4+e.id)*4 if self.state=='curse' and e.team!=self.turn else 0
-            self.draw_egg_disc(e.x+tremble,e.y,e.r,e.team,e.id % self.count + 1,
+            self.draw_egg_disc(e.x+tremble,e.y,e.r,e.team,None if e.skin or e.boss else e.id % self.count + 1,skin=e.skin,
                                selected=(self.dragging_id == e.id),
                                hovered=(hover == e.id and self.dragging_id is None),
                                injured=(e.injury_turns > 0), inspected=(self.inspect_id == e.id),
                                brick=e.brickwall,
                                skill=(next((p.name for p in self.prepared.values() if p and p.egg_id==e.id),None)
                                       if (self.state == "reveal" or e.team == self._input_team()) else None))
-            revealed=self.state in ('reveal','moving','curse')
+            if getattr(self,'net',None) and self.net.playing and self.net.mode!='pvp' and e.team==0:
+                self.label('P'+str(e.owner+1),e.x,e.y+e.r+10,'micro',GOLD if e.owner==self.net.player else WHITE,'center')
+            revealed=self.state in ('reveal','moving','curse','boss_windup')
             prep=next((p.name for p in self.prepared.values() if p and p.egg_id==e.id),None)
             defense=e.defense or (prep if revealed else '')
             if revealed and defense in ('bull','infinity'):
                 radius=e.r+(75 if defense=='bull' else 130)
                 pygame.draw.circle(self.screen,(255,105,50) if defense=='bull' else (95,115,255),(round(e.x),round(e.y)),int(radius),2)
-            if getattr(self,'eyes_targets',{}).get(self.turn)==e.id and (self.cpu_mode=='off' or self.turn==0):
+            if getattr(self,'eyes_targets',{}).get(self.turn)==e.id and (self.cpu_mode=='off' or self.turn==0) and (not getattr(self,'net',None) or not self.net.playing or self.turn==(self.net.player if self.net.mode=='pvp' else 0)):
                 pulse=8+int(4*math.sin(self.frame*.22));pos=(round(e.x),round(e.y))
                 pygame.draw.circle(self.screen,(255,40,220),pos,int(e.r+pulse),6)
                 pygame.draw.line(self.screen,(255,255,255),(pos[0]-e.r-15,pos[1]),(pos[0]+e.r+15,pos[1]),2)
@@ -1145,9 +1192,10 @@ class Game:
         curse_bg=self.curse_background((SCREEN_W,SCREEN_H))
         if curse_bg is not None:self.screen.blit(curse_bg,(0,0))
         self.label("MARBLE FLICK",37,23,"title",TEXT)
-        self.label("PASSIVES + SKILLS  /  V0.7",38,59,"small",MUTED)
+        self.label("BOSSES + LAN  /  V0.8",38,59,"small",MUTED)
         lang=self.profile['settings']['language'];map_name=MAPS[self.arena.map_key][0 if lang=='ko' else 1]
-        self.label(f"{self.count}v{self.count}  |  {map_name}",SCREEN_W-36,31,'body_b',TEXT,'topright')
+        matchup=f"{self.count} vs BOSS" if self.arena.boss_state else f"{self.count}v{self.count}"
+        self.label(f"{matchup}  |  {map_name}",SCREEN_W-36,31,'body_b',TEXT,'topright')
         self.label(f"TURN {self.turn_number}",SCREEN_W-36,60,"small",MUTED,"topright")
         active_color=BLUE if self.turn==0 else RED
         if self.state=="aim":
@@ -1164,6 +1212,8 @@ class Game:
             else:
                 self.label("PHYSICS RUNNING",640,46,"body_b",GOLD,"center")
                 self.label(f"{self.speed_factor}x PHYSICS",640,70,"small",MUTED,"center")
+        elif self.state=="boss_windup":
+            self.label("보스 공격 준비 / BOSS ATTACK",640,55,"body_b",GOLD,"center")
         else:
             self.label("MATCH FINISHED",640,55,"body_b",GOLD,"center")
         self.draw_board()
@@ -1192,9 +1242,10 @@ class Game:
             toast=pygame.Rect(ARENA_RECT.centerx-220,ARENA_RECT.top+41,440,34)
             self.rounded(toast,PANEL,10,(105,178,217))
             self.fit_label(self.status,toast,"small",TEXT)
-        if getattr(self,'eyes_notice',{}).get(self.turn) and (self.cpu_mode=='off' or self.turn==0):
+        own_eyes=not getattr(self,'net',None) or not self.net.playing or self.turn==(self.net.player if self.net.mode=='pvp' else 0)
+        if own_eyes and getattr(self,'eyes_notice',{}).get(self.turn) and (self.cpu_mode=='off' or self.turn==0):
             self.label('EYES: '+self.eyes_notice[self.turn],640,106,'body_b',(130,65,177),'center')
-        if getattr(self,'eyes_flash',0)>0 and (self.cpu_mode=='off' or self.turn==0):
+        if own_eyes and getattr(self,'eyes_flash',0)>0 and (self.cpu_mode=='off' or self.turn==0):
             image=self.menu.assets.image('vfx/eyes_of_heaven.png')
             if image:
                 key=('eyes_banner',)
@@ -1203,6 +1254,12 @@ class Game:
         if self.state=='curse':self.label('CURSE UNLEASHED!',640,80,'heading',(255,90,255),'center')
         if self.state=="over":
             self.draw_victory()
+
+        if self.arena.boss_state:bosses.draw(self)
+        if getattr(self,'net',None) and self.net.playing:
+            text=('LAN · P'+str(self.net.player+1))
+            if self.net.mode!='pvp':text+=' · '+('P'+str(self.net.coop_owner+1))+' 조작 / CONTROLS'
+            self.label(text,640,115,'body_b',GOLD,'center')
 
     def draw_victory(self):
         fog=pygame.Surface((SCREEN_W,SCREEN_H),pygame.SRCALPHA)

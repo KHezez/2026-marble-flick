@@ -34,8 +34,9 @@ SFX.update({
  'eyes_activate':('eyes_activate','천안 감지·대상 공 강조'), 'skin_draw':('skin_draw','스킨 뽑기 결과'),
  'walls_open':('walls_open','13턴 강철 경계벽 개방'),
 })
-MUSIC={k:k+'.mp3' for k in ('main_menu','shop','inventory','match','settings','battle_desert','battle_jungle','battle_barricade','battle_steel','battle_ice','clutch','curse')}
-MUSIC_FALLBACK={'settings':'main_menu','clutch':'match','curse':'match',**{k:'match' for k in MUSIC if k.startswith('battle_')}}
+SFX.update({k:(k,v) for k,v in {'boss_warning':'보스 공격 예고','boss_attack':'보스 패턴 발동','boss_hit':'보스 피격','boss_phase':'보스 2페이즈 전환','boss_defeat':'보스 처치','boss_reward':'전용 스킨 해금','lan_connect':'LAN 연결','lan_disconnect':'LAN 연결 종료'}.items()})
+MUSIC={k:k+'.mp3' for k in ('main_menu','shop','inventory','match','settings','battle_desert','battle_jungle','battle_barricade','battle_steel','battle_ice','clutch','curse','boss_warden','boss_tempest','boss_gokbin','boss_gokbin_phase2')}
+MUSIC_FALLBACK={'settings':'main_menu','clutch':'match','curse':'match',**{k:'match' for k in MUSIC if k.startswith(('battle_','boss_'))}}
 
 
 class SoundBox:

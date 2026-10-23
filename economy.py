@@ -14,7 +14,7 @@ def draw(profile,kind,rng=None):
     rng=rng or random.SystemRandom()
     rarity=rng.choices(list(RATES),weights=list(RATES.values()),k=1)[0]
     pool=[k for k,p in PERKS.items() if p.rarity==rarity] if kind=='passive' else [k for k in SKILLS if SKILL_RARITIES[k]==rarity]
-    if kind=='skin':pool=[k for k,v in SKINS.items() if k!='classic' and v.rarity==rarity]
+    if kind=='skin':pool=[k for k,v in SKINS.items() if k!='classic' and not v.boss_reward and v.rarity==rarity]
     key=rng.choice(pool); field={'passive':'owned_perks','skill':'owned_skills','skin':'owned_skins'}[kind]
     duplicate=key in profile[field]; refund=int(price*.4) if duplicate else 0
     profile['coins']-=price-refund

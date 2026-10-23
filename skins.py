@@ -6,6 +6,8 @@ import pygame
 @dataclass(frozen=True)
 class Skin:
     ko:str; en:str; color:tuple; pattern:str; rarity:str
+    image:str=""
+    boss_reward:bool=False
 
 SKINS={
  'classic':Skin('기본','Classic',(75,175,255),'solid','Common'),
@@ -21,9 +23,40 @@ SKINS={
  'gold':Skin('황금','Golden Crown',(255,198,46),'stars','Legendary'),
 }
 
+for key,ko,en,rarity in (
+ ('cheeky','치키','Cheeky','Common'),('verity','베리티','Verity','Common'),
+ ('gubby','구비','Gubby','Rare'),('man_face','남자 얼굴','Man Face','Rare'),
+ ('gokbin','노곡빈','Gokbin','Epic'),('gokbin_curse','노곡빈의 저주','Gokbin Curse','Legendary')):
+    SKINS[key]=Skin(ko,en,(255,255,255),'photo',rarity,key+'.png',key=='gokbin_curse')
+_IMAGES={}
+_TILES={}
+
+def photo(key,size):
+    from pathlib import Path
+    if key not in _IMAGES:
+        try:
+            original=pygame.image.load(str(Path(__file__).resolve().parent/'assets/skins'/SKINS[key].image))
+            bounds=original.get_bounding_rect(min_alpha=10)
+            _IMAGES[key]=original.subsurface(bounds).copy() if bounds.w and bounds.h else original
+        except (OSError,pygame.error):_IMAGES[key]=None
+    original=_IMAGES[key]
+    if original is None:return None
+    cache=(key,size)
+    if cache not in _TILES:
+        scale=size/max(original.get_size())
+        _TILES[cache]=pygame.transform.smoothscale(original,(max(1,round(original.get_width()*scale)),max(1,round(original.get_height()*scale))))
+        if len(_TILES)>160:_TILES.pop(next(iter(_TILES)))
+    return _TILES[cache]
+
 def paint(surface,rect,key,team=0):
     key=key if key in SKINS else 'classic';skin=SKINS[key]
     r=max(3,int(min(rect.width,rect.height)/2));size=2*r
+    if skin.image:
+        tile=photo(key,size)
+        if tile is not None:
+            surface.blit(tile,tile.get_rect(center=rect.center))
+            pygame.draw.circle(surface,(64,174,255) if team==0 else (255,75,99),rect.center,r,2)
+            return
     tile=pygame.Surface((size,size),pygame.SRCALPHA)
     color=((52,161,255) if team==0 else (240,65,85)) if key=='classic' else skin.color
     pygame.draw.circle(tile,color,(r,r),r)

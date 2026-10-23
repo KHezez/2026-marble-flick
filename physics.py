@@ -60,6 +60,9 @@ class Egg:
     invulnerable_until: float = 0.0
     curve: float = 0.0
     base_radius: float = 19.0
+    owner: int = -1
+    skin: str = ""
+    boss: bool = False
 
     @property
     def speed(self) -> float:
@@ -122,6 +125,15 @@ class Arena(CombatRules):
     clutch_used: set = field(default_factory=set)
     previous_counts: dict = field(default_factory=dict)
 
+    boss_state: dict | None = None
+    boss_hits: dict = field(default_factory=dict)
+    owner_stats: dict = field(default_factory=dict)
+    owner_perks: dict = field(default_factory=dict)
+
+    def stats_for(self,e):return self.owner_stats.get(e.owner,self.team_stats[e.team])
+    def perks_for(self,e):return self.owner_perks.get(e.owner,self.team_perks.get(e.team,[]))
+    def mult_for(self,e,stat):return factor(self.perks_for(e),stat)
+
     def configure_perks(self, loadouts, count):
         for team in (0, 1):
             validate(loadouts.get(team, []), count)
@@ -141,15 +153,15 @@ class Arena(CombatRules):
 
     def cone(self, egg):
         from stats import accuracy_cone
-        return accuracy_cone(self.terrain_at(egg.x,egg.y), self.team_stats[egg.team], egg.injury_turns > 0) / self.mult(egg.team, 'accuracy')
+        return accuracy_cone(self.terrain_at(egg.x,egg.y), self.stats_for(egg), egg.injury_turns > 0) / self.mult_for(egg, 'accuracy')
 
     def friendship(self, egg):
-        if 'friendship' not in self.team_perks.get(egg.team, []): return 1.0
+        if 'friendship' not in self.perks_for(egg): return 1.0
         neighbours = sum(e.id != egg.id and hypot(e.x-egg.x,e.y-egg.y) <= 95 for e in self.living(egg.team))
         return 1 + min(.25, .05 * (neighbours + 1)) if neighbours else 1.0
 
     def toughness(self, egg):
-        return self.mult(egg.team, 'toughness') * self.friendship(egg)
+        return self.mult_for(egg, 'toughness') * self.friendship(egg)
 
     def check_survivors(self):
         for team in (0,1):
@@ -160,7 +172,7 @@ class Arena(CombatRules):
                 if previous>=2 and team not in self.clutch_used:
                     self.clutch_used.add(team)
                     self.events.append(Event('clutch', e.x,e.y,team,1))
-                if 'last_resort' in self.team_perks.get(team,[]) and team not in self.last_resort_used:
+                if 'last_resort' in self.perks_for(e) and team not in self.last_resort_used:
                     self.last_resort_used.add(team)
                     self.last_resort_until[team] = self.turn_number
                     self.events.append(Event('last_resort',e.x,e.y,team,1))
@@ -180,6 +192,10 @@ class Arena(CombatRules):
                 if e.x > self.right-e.r: e.x=self.right-e.r; e.vx=-abs(e.vx)*.83
                 if e.y < self.top+e.r: e.y=self.top+e.r; e.vy=abs(e.vy)*.83
                 if e.y > self.bottom-e.r: e.y=self.bottom-e.r; e.vy=-abs(e.vy)*.83
+            elif e.boss and not (self.left <= e.x <= self.right and self.top <= e.y <= self.bottom):
+                from bosses import hurt
+                hurt(self,35)
+                e.x=max(self.left+e.r,min(self.right-e.r,e.x));e.y=max(self.top+e.r,min(self.bottom-e.r,e.y));e.vx=e.vy=0
             elif not (self.left <= e.x <= self.right and self.top <= e.y <= self.bottom):
                 e.alive=False
                 e.vx=e.vy=0
@@ -211,7 +227,7 @@ class Arena(CombatRules):
         egg = next((e for e in self.living() if e.id == egg_id), None)
         if egg is None or egg.injury_turns or egg.brickwall or self.invulnerable(egg):
             return False  # non-stacking injury
-        egg.injury_turns = max(0, turns - (1 if "tungsten" in self.team_perks.get(egg.team, []) else 0))
+        egg.injury_turns = max(0, turns - (1 if "tungsten" in self.perks_for(egg) else 0))
         self.events.append(Event("injury", egg.x, egg.y, team=egg.team, strength=1.0))
         return True
 
@@ -251,7 +267,7 @@ class Arena(CombatRules):
         else:
             role = "neutral"
         return max(0.05, egg.mass * collision_mass_multiplier(
-            self.team_stats[egg.team], role, egg.injury_turns > 0) * self.toughness(egg))
+            self.stats_for(egg), role, egg.injury_turns > 0) * self.toughness(egg))
 
     def shoot(self, egg_id: int, dx: float, dy: float, power_scale: float = BASE_POWER_SCALE, ability: str = "", curve: float = 0.0) -> bool:
         """Launch an idle egg. Input vector points TOWARD the target.
@@ -263,11 +279,11 @@ class Arena(CombatRules):
         if selected is None or selected.brickwall or magnitude < MIN_PULL or self.moving():
             return False
         launch_speed = (min(magnitude, MAX_PULL) * power_scale *
-                        shot_speed_multiplier(self.team_stats[selected.team], selected.injury_turns > 0))
-        launch_speed *= self.mult(selected.team, "speed")
-        selected.curve = max(-1.5, min(1.5, curve)) if "curve" in self.team_perks.get(selected.team, []) else 0.0
+                        shot_speed_multiplier(self.stats_for(selected), selected.injury_turns > 0))
+        launch_speed *= self.mult_for(selected, "speed")
+        selected.curve = max(-1.5, min(1.5, curve)) if "curve" in self.perks_for(selected) else 0.0
         if ability == "tiger":
-            launch_speed *= 3.0  # +200% speed
+            launch_speed *= 2.0  # v0.8 +100% speed
         if ability == "bull":launch_speed *= 1.5
         for e in self.eggs:
             e.bull = False
@@ -301,7 +317,7 @@ class Arena(CombatRules):
         # Each link becomes noticeably weaker than the previous one.
         attenuation = 0.78 ** e.chain_followups
         speed = MAX_PULL * BASE_POWER_SCALE * 0.91 * attenuation
-        speed *= shot_speed_multiplier(self.team_stats[e.team], e.injury_turns > 0) * self.mult(e.team, "speed")
+        speed *= shot_speed_multiplier(self.stats_for(e), e.injury_turns > 0) * self.mult_for(e, "speed")
         e.vx, e.vy = dx / magnitude * speed, dy / magnitude * speed
         self.events.append(Event("chain_dash", e.x, e.y, e.team, 1.0))
         return True
@@ -321,8 +337,11 @@ class Arena(CombatRules):
             if dist <= radius + other.r:
                 if dist < 0.001:
                     dx, dy, dist = 0.0, 1.0, 1.0
-                strength = self.mult(e.team, "power") * power_transfer_multiplier(self.team_stats[e.team], e.injury_turns > 0) * 1220.0 * max(0.15, 1.0 - dist / (radius + other.r))
-                toughness = collision_mass_multiplier(self.team_stats[other.team], "defend", other.injury_turns > 0) * self.toughness(other)
+                strength = self.mult_for(e, "power") * power_transfer_multiplier(self.stats_for(e), e.injury_turns > 0) * 1220.0 * max(0.15, 1.0 - dist / (radius + other.r))
+                if other.boss:
+                    from bosses import hurt
+                    hurt(self,min(40,strength/30))
+                toughness = collision_mass_multiplier(self.stats_for(other), "defend", other.injury_turns > 0) * self.toughness(other)
                 other.vx += dx / dist * strength / max(.1, toughness)
                 other.vy += dy / dist * strength / max(.1, toughness)
         self.events.append(Event("cola_explosion", e.x, e.y, e.team, 1.0))
@@ -377,7 +396,7 @@ class Arena(CombatRules):
                     co,si=cos(angle),sin(angle)
                     e.vx,e.vy=e.vx*co-e.vy*si,e.vx*si+e.vy*co
                     e.curve *= exp(-1.2*dt)
-                resistance = drag_resistance_multiplier(self.team_stats[e.team], e.injury_turns > 0)
+                resistance = drag_resistance_multiplier(self.stats_for(e), e.injury_turns > 0)
                 local_floor=self.terrain_at(e.x,e.y)
                 local_drag=drag if local_floor==self.floor or self.drag_override is not None else DRAG[local_floor]
                 damp = exp(-local_drag * resistance * dt)
@@ -402,8 +421,8 @@ class Arena(CombatRules):
                 dist = hypot(dx, dy)
                 if shooter.r + other.r < dist < shooter.r + other.r + 69.0:
                     if dist > 1e-6:
-                        other.vx += dx / dist * 195.0 / self.toughness(other)
-                        other.vy += dy / dist * 195.0 / self.toughness(other)
+                        other.vx += dx / dist * 97.5 / self.toughness(other)
+                        other.vy += dy / dist * 97.5 / self.toughness(other)
                         self._wind_seen.add(other.id)
                         self.events.append(Event("tiger_wind", other.x, other.y, other.team, .55))
         # Resolve positional contacts iteratively to avoid stacked-overlap artefacts.
@@ -481,16 +500,19 @@ class Arena(CombatRules):
         key=tuple(sorted((a.id,b.id)))
         if striker is not None and self.elapsed-self._power_contacts.get(key,-1e8)>=.08:
             self._power_contacts[key]=self.elapsed
-            transfer = power_transfer_multiplier(self.team_stats[striker.team], striker.injury_turns > 0) * self.mult(striker.team, "power")
+            transfer = power_transfer_multiplier(self.stats_for(striker), striker.injury_turns > 0) * self.mult_for(striker, "power")
             if striker.bull:transfer *= 1.5
             if striker.tiger:
-                transfer *= 3.0  # +200% POWER
+                transfer *= 1.8  # v0.8 +80% power
             if striker.chain:
                 transfer *= 0.78 ** striker.chain_followups
             extra = (transfer - 1.0) * j * (inv_b if victim is b else inv_a)
             direction = 1.0 if victim is b else -1.0
             victim.vx += nx * extra * direction
             victim.vy += ny * extra * direction
+        if emit and (a.boss or b.boss):
+            from bosses import contact
+            contact(self,a if a.boss else b,b if a.boss else a,-vn)
         self.limit_velocity(a);self.limit_velocity(b)
         if emit and -vn > 65:
             if a.brickwall or b.brickwall:
@@ -512,7 +534,7 @@ class Arena(CombatRules):
             cooldown = self._contact_cooldowns.get(key, -1e8)
             if self.elapsed - cooldown >= 0.20 and approach_speed >= 85:
                 self._contact_cooldowns[key] = self.elapsed
-                chance = min(1.0, critical_chance(self.team_stats[striker.team], striker.injury_turns > 0) * self.mult(striker.team, "critical"))
+                chance = min(1.0, critical_chance(self.stats_for(striker), striker.injury_turns > 0) * self.mult_for(striker, "critical"))
                 if not victim.brickwall and victim.injury_turns == 0 and self.rng.random() < chance:
                     self.injure(victim.id)
 

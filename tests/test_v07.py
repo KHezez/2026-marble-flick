@@ -166,7 +166,7 @@ class ProfileAndLauncherTests(unittest.TestCase):
              'loadouts':{'default':{'skills':['cola','chain'],'perks':['eyes'],'stats':{'power':30}}},
              'red_loadout':{'skills':['brickwall'],'perks':['heavy'],'stats':{'speed':20}}}
         new=SaveStore.sanitize(raw)
-        self.assertEqual(new['coins'],70);self.assertEqual(new['version'],2)
+        self.assertEqual(new['coins'],70);self.assertEqual(new['version'],3)
         self.assertEqual(active(new)['skills'],['cola','chain']);self.assertEqual(active(new)['stats']['power'],30)
         self.assertEqual(new['red_loadout']['stats']['speed'],20);self.assertEqual(new['settings']['language'],'ko')
     def test_skin_draw_100_duplicate_40_and_roundtrip(self):
@@ -221,7 +221,7 @@ class V07SDLTests(unittest.TestCase):
         self.assertTrue(g.arena.moving());self.assertEqual(g.sound.play_counts['curse_release'],1)
         self.assertFalse(g.loadouts[0].ready('curse',100))
     def test_curse_optional_image_and_fallback(self):
-        g=self.g;g.start_match();g.state='curse';self.assertIsNone(g.curse_background((560,675)))
+        g=self.g;g.start_match();g.state='curse';g.menu.assets.images['themes/노곡빈.png']=None;self.assertIsNone(g.curse_background((560,675)))
         g.menu.assets.images['themes/노곡빈.png']=pygame.Surface((64,64));g.menu.assets.images['themes/노곡빈.png'].fill((100,0,200))
         self.assertEqual(g.curse_background((560,675)).get_size(),(560,675));g.draw_hud()
     def test_every_menu_tab_language_map_and_assets_render(self):

@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 SKILLS = ("brickwall", "tiger", "chain", "cola", "bull", "ankle_breaker", "curse", "infinity")
 SKILL_NAMES = {"brickwall": "BRICKWALL", "tiger": "TIGER SHOT", "chain": "CHAIN", "cola": "COCA COLA ESPUMA"}
 SKILL_NAMES.update(bull="BULL",ankle_breaker="ANKLE BREAKER",curse="NOGOKBIN CURSE",infinity="INFINITY")
-COOLDOWNS = {"brickwall": 6, "tiger": 7, "chain": 10, "cola": 7, "bull":8, "ankle_breaker":5, "curse":0, "infinity":8}
+COOLDOWNS = {"brickwall": 6, "tiger": 8, "chain": 10, "cola": 7, "bull":8, "ankle_breaker":5, "curse":0, "infinity":8}
 
 
 @dataclass
@@ -59,7 +59,7 @@ def can_prepare(skill: str, is_attacker: bool) -> bool:
 FUTURE_SKILLS = {}  # All eight planned skills are now playable.
 SKILL_DESCRIPTIONS = {
  'brickwall':'Concrete anchor: size +75%, immobile, injury immune. Attack 2 turns / defense 1.',
- 'tiger':'One shot: speed/power +200%, zero aim error, wood break and wind pressure.',
+ 'tiger':'One shot: speed +100%, power +80%, zero aim error, wood break and wind pressure.',
  'chain':'Hit an enemy then E to redirect. Up to 5 weaker follow-ups.',
  'cola':'Explode on stop. Sacrifice shooter unless it is your last marble.',
 }

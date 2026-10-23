@@ -87,7 +87,7 @@ class TurnStateTests(unittest.TestCase):
         g.ready_defense();g._start_reveal();g._launch_revealed()
         self.assertTrue(blue.tiger)
         self.assertEqual(g.last_deviation,0)
-        self.assertEqual(g.loadouts[0].remaining('tiger',1),7)
+        self.assertEqual(g.loadouts[0].remaining('tiger',1),8)
 
     def test_human_can_defend_when_cpu_attacks(self):
         g=build_game(cpu='easy')
