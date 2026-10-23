@@ -7,3 +7,9 @@
 - Windows 빌드는 `.github/workflows/windows-exe.yml`에서 수행합니다. Windows 소스 테스트와 실제 EXE 자가 검사, EXE 두 프로세스의 TCP 경기가 통과한 파일만 릴리스합니다.
 - 빌드 완료 시 이 폴더에 `windows-exe-test.json`과 `MarbleFlick.exe.sha256`을 기록합니다. 릴리스에도 같은 파일을 첨부합니다.
 - 실제 두 PC의 공유기/방화벽 환경과 스피커 출력은 자동 검사 범위 밖입니다.
+
+## Windows 최종 결과
+
+- Windows x64 소스 테스트 144개 통과. 실제 단일 EXE의 메뉴·에셋·저장·보스 검사 및 두 EXE 프로세스 TCP LAN 검사 통과.
+- v0.8.1 GitHub Release 업로드 완료. 공개 다운로드 111,767,291바이트 및 SHA-256 일치 확인.
+- CI의 검증 기록 자동 커밋 단계는 실패했으므로, 릴리스에서 검증 파일을 내려받아 별도로 저장했습니다. EXE 빌드·검사·업로드는 모두 성공했습니다.

@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "frozen": true,
+  "save_path": "D:\\a\\2026-marble-flick\\2026-marble-flick\\dist\\user_data\\profile.json",
+  "executable": "D:\\a\\2026-marble-flick\\2026-marble-flick\\dist\\MarbleFlick.exe",
+  "sfx_decoded": 49,
+  "music_decoded": 15,
+  "fallback_sfx": [
+    "defeat.mp3",
+    "countdown.mp3",
+    "curse_launch.mp3",
+    "skin_draw.mp3",
+    "boss_warning.mp3"
+  ],
+  "skins": 17,
+  "menus": true,
+  "bosses": true,
+  "saves": true,
+  "event_loop": true,
+  "two_exe_lan": "passed"
+}
